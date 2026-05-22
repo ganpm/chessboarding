@@ -73,6 +73,9 @@ function App() {
   const previewMoves = previewPosition
     ? getLegalMovesForPosition(game, previewPosition)
     : [];
+  const previewPiece = previewPosition
+    ? getPieceAt(game.board, previewPosition)
+    : null;
 
   return (
     <div className="flex h-128 justify-center items-start gap-5 my-20">
@@ -82,6 +85,7 @@ function App() {
         onSquareHover={handleSquareHover}
         selectedPosition={previewPosition}
         legalMoves={previewMoves}
+        previewPiece={previewPiece}
       />
       <Movelist moves={game.moves} />
     </div>

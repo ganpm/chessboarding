@@ -1,4 +1,4 @@
-export type SquareColor = "white" | "black";
+export type SquareColor = "light" | "dark";
 export type Player = "white" | "black";
 
 export type King = "king";
@@ -646,7 +646,12 @@ const getSpecialMoves = (game: GameState, position: Position): Position[] => {
   return specialMoves;
 };
 
-const createMove = (game: GameState, from: Position, to: Position): Move | null => {
+const createMove = (
+  game: GameState,
+  from: Position,
+  to: Position,
+  evaluateCheckmate: boolean = true,
+): Move | null => {
   const piece = getPieceAt(game.board, from);
   if (!piece) return null;
 
@@ -709,10 +714,15 @@ const createMove = (game: GameState, from: Position, to: Position): Move | null 
     moves: [...game.moves, baseMove],
   };
 
+  let isCheckmate = false;
+  if (evaluateCheckmate && isCheck) {
+    isCheckmate = !hasAnyLegalMove(nextGame, opponent);
+  }
+
   return {
     ...baseMove,
     isCheck,
-    isCheckmate: isCheck && !hasAnyLegalMove(nextGame, opponent),
+    isCheckmate,
   };
 };
 
@@ -765,7 +775,7 @@ export const getLegalMovesForPosition = (game: GameState, position: Position): P
   ];
 
   return pseudoMoves.filter((to) => {
-    const move = createMove(game, position, to);
+    const move = createMove(game, position, to, false);
     if (!move) return false;
 
     const nextBoard = applyMoveToBoard(game.board, move);

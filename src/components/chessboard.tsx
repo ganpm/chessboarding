@@ -3,6 +3,7 @@ import { Square } from "@/components/square";
 import {
   type SquareColor,
   type Board,
+  type Piece,
   type Position,
   positions,
 } from "@/data/game";
@@ -13,12 +14,13 @@ interface ChessboardProps extends React.HTMLAttributes<HTMLDivElement> {
   onSquareHover: (position: Position | null) => void;
   selectedPosition: Position | null;
   legalMoves: Position[];
+  previewPiece: Piece | null;
 }
 
 const indexColor = (index: number): SquareColor => {
   const row = Math.floor(index / 8);
   const col = index % 8;
-  return (row + col) % 2 === 0 ? "white" : "black";
+  return (row + col) % 2 === 0 ? "light" : "dark";
 };
 
 export const Chessboard = ({
@@ -27,6 +29,7 @@ export const Chessboard = ({
   onSquareHover,
   selectedPosition,
   legalMoves,
+  previewPiece,
   ...props
 }: ChessboardProps) => {
   return (
@@ -45,6 +48,7 @@ export const Chessboard = ({
             selected={isSelected}
             legalMove={isLegalMove}
             captureTarget={isCaptureTarget}
+            ghostPiece={isLegalMove ? previewPiece : null}
             onClick={() => onSquareClick(position)}
             onMouseEnter={() => onSquareHover(position)}
             onMouseLeave={() => onSquareHover(null)}

@@ -1,180 +1,35 @@
-export type SquareColor = "light" | "dark";
-export type Player = "white" | "black";
+import {
+  type Piece,
+  type PieceType,
+  type Player,
+  getPieceInfo,
+  getPieceOwner,
+  getPieceType,
+} from "@/data/piece";
+import {
+  type Board,
+  type Square,
+  SQUARES,
+  coordsToSquare,
+  getPieceAt,
+  isSquareEmpty,
+  squareToCoords,
+} from "@/data/square";
 
-export type King = "king";
-export type Queen = "queen";
-export type Rook = "rook";
-export type Bishop = "bishop";
-export type Knight = "knight";
-export type Pawn = "pawn";
-
-export type PieceType = King | Queen | Rook | Bishop | Knight | Pawn;
-export type PieceOwner = Player;
-
-
-export type Piece = `${PieceOwner} ${PieceType}`;
-
-export const ranks = ["1", "2", "3", "4", "5", "6", "7", "8"] as const;
-export const files = ["a", "b", "c", "d", "e", "f", "g", "h"] as const;
-
-export type Rank = typeof ranks[number];
-export type File = typeof files[number];
-
-export type Position = `${File}${Rank}`;
-
-export const positions: Position[] = files.flatMap(
-  file => ranks.toReversed().map(rank => `${file}${rank}` as Position)
-);
-
-export type Board = Map<Position, Piece | null>;
-
-export const initialBoard: Board = new Map<Position, Piece | null>([
-  ["a1", "white rook"],
-  ["b1", "white knight"],
-  ["c1", "white bishop"],
-  ["d1", "white queen"],
-  ["e1", "white king"],
-  ["f1", "white bishop"],
-  ["g1", "white knight"],
-  ["h1", "white rook"],
-  ["a2", "white pawn"],
-  ["b2", "white pawn"],
-  ["c2", "white pawn"],
-  ["d2", "white pawn"],
-  ["e2", "white pawn"],
-  ["f2", "white pawn"],
-  ["g2", "white pawn"],
-  ["h2", "white pawn"],
-  ["a3", null],
-  ["b3", null],
-  ["c3", null],
-  ["d3", null],
-  ["e3", null],
-  ["f3", null],
-  ["g3", null],
-  ["h3", null],
-  ["a4", null],
-  ["b4", null],
-  ["c4", null],
-  ["d4", null],
-  ["e4", null],
-  ["f4", null],
-  ["g4", null],
-  ["h4", null],
-  ["a5", null],
-  ["b5", null],
-  ["c5", null],
-  ["d5", null],
-  ["e5", null],
-  ["f5", null],
-  ["g5", null],
-  ["h5", null],
-  ["a6", null],
-  ["b6", null],
-  ["c6", null],
-  ["d6", null],
-  ["e6", null],
-  ["f6", null],
-  ["g6", null],
-  ["h6", null],
-  ["a7", "black pawn"],
-  ["b7", "black pawn"],
-  ["c7", "black pawn"],
-  ["d7", "black pawn"],
-  ["e7", "black pawn"],
-  ["f7", "black pawn"],
-  ["g7", "black pawn"],
-  ["h7", "black pawn"],
-  ["a8", "black rook"],
-  ["b8", "black knight"],
-  ["c8", "black bishop"],
-  ["d8", "black queen"],
-  ["e8", "black king"],
-  ["f8", "black bishop"],
-  ["g8", "black knight"],
-  ["h8", "black rook"],
-]);
-
-export const positionToCoords = (position: Position): [number, number] => {
-  const file = position[0];
-  const rank = position[1];
-
-  const fileToCoord: Record<string, number> = {
-    "a": 0,
-    "b": 1,
-    "c": 2,
-    "d": 3,
-    "e": 4,
-    "f": 5,
-    "g": 6,
-    "h": 7,
-  };
-
-  const rankToCoord: Record<string, number> = {
-    "1": 0,
-    "2": 1,
-    "3": 2,
-    "4": 3,
-    "5": 4,
-    "6": 5,
-    "7": 6,
-    "8": 7,
-  };
-
-  return [fileToCoord[file], rankToCoord[rank]];
-};
-
-
-export const coordsToPosition = (file: number, rank: number): Position => {
-  const coordToFile: Record<number, string> = {
-    0: "a",
-    1: "b",
-    2: "c",
-    3: "d",
-    4: "e",
-    5: "f",
-    6: "g",
-    7: "h",
-  };
-
-  const coordToRank: Record<number, string> = {
-    0: "1",
-    1: "2",
-    2: "3",
-    3: "4",
-    4: "5",
-    5: "6",
-    6: "7",
-    7: "8",
-  };
-
-  if (!coordToFile[file] || !coordToRank[rank]) {
-    throw new Error(`Invalid coordinates: (${file}, ${rank})`);
-  }
-
-  return `${coordToFile[file]}${coordToRank[rank]}` as Position;
-};
-
-export const getPieceType = (piece: Piece): PieceType => {
-  return piece.split(" ")[1] as PieceType;
-};
-
-export const getPieceOwner = (piece: Piece): Player => {
-  return piece.split(" ")[0] as Player;
-};
-
-export const getPieceInfo = (piece: Piece): { pieceOwner: PieceOwner, pieceType: PieceType } => {
-  const [pieceOwner, pieceType] = piece.split(" ") as [PieceOwner, PieceType];
-  return { pieceOwner, pieceType };
-};
-
-export const getPieceAt = (board: Board, position: Position): Piece | null => {
-  return board.get(position) || null;
-};
-
-export const isPositionEmpty = (board: Board, position: Position): boolean => {
-  return !board.get(position);
-};
+export type { Piece, PieceOwner, PieceType, Player } from "@/data/piece";
+export { PIECE_TYPES } from "@/data/piece";
+export { getPieceInfo, getPieceOwner, getPieceType } from "@/data/piece";
+export type { Board, Square, SquareColor } from "@/data/square";
+export {
+  FILES,
+  RANKS,
+  SQUARES,
+  coordsToSquare,
+  getPieceAt,
+  initialBoard,
+  isSquareEmpty,
+  squareToCoords,
+} from "@/data/square";
 
 export interface GameState {
   board: Board;
@@ -182,11 +37,11 @@ export interface GameState {
 }
 
 export interface Move {
-  from: Position;
-  to: Position;
+  from: Square;
+  to: Square;
   piece: Piece;
   capturedPiece: Piece | null;
-  capturedPosition: Position | null;
+  capturedPosition: Square | null;
   isCastleKingside: boolean;
   isCastleQueenside: boolean;
   isEnPassant: boolean;
@@ -194,22 +49,6 @@ export interface Move {
   isCheck: boolean;
   isCheckmate: boolean;
 }
-
-export interface GameFlags {
-  whiteCanCastleKingside: boolean;
-  whiteCanCastleQueenside: boolean;
-  blackCanCastleKingside: boolean;
-  blackCanCastleQueenside: boolean;
-  enPassantTarget: Position | null;
-}
-
-export const initialFlags: GameFlags = {
-  whiteCanCastleKingside: true,
-  whiteCanCastleQueenside: true,
-  blackCanCastleKingside: true,
-  blackCanCastleQueenside: true,
-  enPassantTarget: null,
-};
 
 const getOpponent = (player: Player): Player => {
   return player === "white" ? "black" : "white";
@@ -219,211 +58,322 @@ export const getCurrentPlayer = (moves: Move[]): Player => {
   return moves.length % 2 === 0 ? "white" : "black";
 };
 
-export const getGameFlags = (game: GameState): GameFlags => {
-  const flags: GameFlags = {
-    ...initialFlags,
-  };
-
-  for (const move of game.moves) {
-    const owner = getPieceOwner(move.piece);
-    const type = getPieceType(move.piece);
-
-    if (type === "king") {
-      if (owner === "white") {
-        flags.whiteCanCastleKingside = false;
-        flags.whiteCanCastleQueenside = false;
-      } else {
-        flags.blackCanCastleKingside = false;
-        flags.blackCanCastleQueenside = false;
-      }
-    }
-
-    if (type === "rook") {
-      if (owner === "white" && move.from === "h1") flags.whiteCanCastleKingside = false;
-      if (owner === "white" && move.from === "a1") flags.whiteCanCastleQueenside = false;
-      if (owner === "black" && move.from === "h8") flags.blackCanCastleKingside = false;
-      if (owner === "black" && move.from === "a8") flags.blackCanCastleQueenside = false;
-    }
-
-    if (move.capturedPiece === "white rook") {
-      if (move.capturedPosition === "h1") flags.whiteCanCastleKingside = false;
-      if (move.capturedPosition === "a1") flags.whiteCanCastleQueenside = false;
-    }
-
-    if (move.capturedPiece === "black rook") {
-      if (move.capturedPosition === "h8") flags.blackCanCastleKingside = false;
-      if (move.capturedPosition === "a8") flags.blackCanCastleQueenside = false;
-    }
-  }
-
+export const getEnPassantTarget = (game: GameState): Square | null => {
   const lastMove = game.moves.at(-1);
-  if (lastMove && getPieceType(lastMove.piece) === "pawn") {
-    const [, fromRank] = positionToCoords(lastMove.from);
-    const [, toRank] = positionToCoords(lastMove.to);
-    if (Math.abs(toRank - fromRank) === 2) {
-      const [file] = positionToCoords(lastMove.from);
-      const middleRank = (fromRank + toRank) / 2;
-      flags.enPassantTarget = coordsToPosition(file, middleRank);
-    }
+  if (!lastMove || getPieceType(lastMove.piece) !== "pawn") {
+    return null;
   }
 
-  return flags;
+  const [, fromRank] = squareToCoords(lastMove.from);
+  const [, toRank] = squareToCoords(lastMove.to);
+  if (Math.abs(toRank - fromRank) !== 2) {
+    return null;
+  }
+
+  const [file] = squareToCoords(lastMove.from);
+  const middleRank = (fromRank + toRank) / 2;
+  return coordsToSquare(file, middleRank);
+};
+
+export const canCastleKingside = (game: GameState, player: Player): boolean => {
+  const kingPiece = `${player} king` as Piece;
+  const rookPiece = `${player} rook` as Piece;
+  const rookStart = player === "white" ? "h1" : "h8";
+
+  return !game.moves.some((move) => {
+    if (move.piece === kingPiece) {
+      return true;
+    }
+
+    if (move.piece === rookPiece && move.from === rookStart) {
+      return true;
+    }
+
+    return move.capturedPiece === rookPiece && move.capturedPosition === rookStart;
+  });
+};
+
+export const canCastleQueenside = (game: GameState, player: Player): boolean => {
+  const kingPiece = `${player} king` as Piece;
+  const rookPiece = `${player} rook` as Piece;
+  const rookStart = player === "white" ? "a1" : "a8";
+
+  return !game.moves.some((move) => {
+    if (move.piece === kingPiece) {
+      return true;
+    }
+
+    if (move.piece === rookPiece && move.from === rookStart) {
+      return true;
+    }
+
+    return move.capturedPiece === rookPiece && move.capturedPosition === rookStart;
+  });
 };
 
 
-export const getPossibleMoves = (board: Board, position: Position): Position[] => {
-  const piece = getPieceAt(board, position);
-  if (!piece) return [];
-  const [file, rank] = positionToCoords(position);
-  const { pieceOwner, pieceType } = getPieceInfo(piece);
-  let moves: Position[] = [];
+const isKingMoveSafe = (board: Board, from: Square, to: Square, owner: Player): boolean => {
+  const piece = getPieceAt(board, from);
+  if (!piece) {
+    return false;
+  }
 
-  switch (pieceType) {
-    case "pawn":
-      if (pieceOwner === "white") {
-        if (rank < 7) {
-          // Pawns move forward, so we check the square directly in front
-          const forwardPos = coordsToPosition(file, rank + 1);
-          if (isPositionEmpty(board, forwardPos)) {
-            moves.push(forwardPos);
-            // If the pawn is on its starting rank, it can move two squares forward
-            if (rank === 1) {
-              const doubleForwardPos = coordsToPosition(file, rank + 2);
-              if (isPositionEmpty(board, doubleForwardPos)) {
-                moves.push(doubleForwardPos);
-              }
-            }
-          }
-          // Pawns capture diagonally, so we check the squares diagonally in front
-          if (file > 0) {
-            const captureLeftPos = coordsToPosition(file - 1, rank + 1);
-            const captureLeftPiece = getPieceAt(board, captureLeftPos);
-            if (captureLeftPiece && getPieceOwner(captureLeftPiece) === "black") {
-              moves.push(captureLeftPos);
-            }
-          }
-          if (file < 7) {
-            const captureRightPos = coordsToPosition(file + 1, rank + 1);
-            const captureRightPiece = getPieceAt(board, captureRightPos);
-            if (captureRightPiece && getPieceOwner(captureRightPiece) === "black") {
-              moves.push(captureRightPos);
-            }
-          }
-        }
-      } else {
-        if (rank > 0) {
-          const forwardPos = coordsToPosition(file, rank - 1);
-          if (isPositionEmpty(board, forwardPos)) {
-            moves.push(forwardPos);
-            if (rank === 6) {
-              const doubleForwardPos = coordsToPosition(file, rank - 2);
-              if (isPositionEmpty(board, doubleForwardPos)) {
-                moves.push(doubleForwardPos);
-              }
-            }
-          }
-          if (file > 0) {
-            const captureLeftPos = coordsToPosition(file - 1, rank - 1);
-            const captureLeftPiece = getPieceAt(board, captureLeftPos);
-            if (captureLeftPiece && getPieceOwner(captureLeftPiece) === "white") {
-              moves.push(captureLeftPos);
-            }
-          }
-          if (file < 7) {
-            const captureRightPos = coordsToPosition(file + 1, rank - 1);
-            const captureRightPiece = getPieceAt(board, captureRightPos);
-            if (captureRightPiece && getPieceOwner(captureRightPiece) === "white") {
-              moves.push(captureRightPos);
-            }
+  const nextBoard = new Map(board);
+  nextBoard.set(from, null);
+  nextBoard.set(to, piece);
+
+  return !isSquareAttacked(nextBoard, to, getOpponent(owner));
+};
+
+const getPossiblePawnMoves = (game: GameState, square: Square, pieceOwner: Player): Square[] => {
+  const board = game.board;
+  const [file, rank] = squareToCoords(square);
+  const moves: Square[] = [];
+  const enPassantTarget = getEnPassantTarget(game);
+
+  if (pieceOwner === "white") {
+    if (rank < 7) {
+      const forwardPos = coordsToSquare(file, rank + 1);
+      if (isSquareEmpty(board, forwardPos)) {
+        moves.push(forwardPos);
+        if (rank === 1) {
+          const doubleForwardPos = coordsToSquare(file, rank + 2);
+          if (isSquareEmpty(board, doubleForwardPos)) {
+            moves.push(doubleForwardPos);
           }
         }
       }
-      break;
-    case "rook":
-      // Rooks can move any number of squares along a rank or file, but cannot leap over other pieces
-      const rookDirections: [number, number][] = [
-        [ 1,  0],
-        [-1,  0],
-        [ 0,  1],
-        [ 0, -1]
-      ];
-      moves = moves.concat(getLinearMoves(board, position, rookDirections));
-      break;
-    case "knight":
-      // Knights move in an L-shape: two squares in one direction and then one square perpendicular to that
-      const knightMoves: [number, number][] = [
-        [ 2,  1],
-        [ 2, -1],
-        [-2,  1],
-        [-2, -1],
-        [ 1,  2],
-        [ 1, -2],
-        [-1,  2],
-        [-1, -2]
-      ];
-      moves = moves.concat(getSingleMoves(board, position, knightMoves));
-      break;
-    case "bishop":
-      // Bishops can move any number of squares diagonally, but cannot leap over other pieces
-      const bishopDirections: [number, number][] = [
-        [ 1,  1],
-        [ 1, -1],
-        [-1,  1],
-        [-1, -1]
-      ];
-      moves = moves.concat(getLinearMoves(board, position, bishopDirections));
-      break;
-    case "queen":
-      // Queens can move any number of squares along a rank, file, or diagonal, but cannot leap over other pieces
-      const queenDirections: [number, number][] = [
-        [ 1,  0],
-        [-1,  0],
-        [ 0,  1],
-        [ 0, -1],
-        [ 1,  1],
-        [ 1, -1],
-        [-1,  1],
-        [-1, -1]
-      ];
-      moves = moves.concat(getLinearMoves(board, position, queenDirections));
-      break;
-    case "king":
-      // Kings can move one square in any direction
-      const kingMoves: [number, number][] = [
-        [ 1,  0],
-        [-1,  0],
-        [ 0,  1],
-        [ 0, -1],
-        [ 1,  1],
-        [ 1, -1],
-        [-1,  1],
-        [-1, -1]
-      ];
-      moves = moves.concat(getSingleMoves(board, position, kingMoves));
-      break;
-    default:
-      throw new Error(`Unknown piece type: ${pieceType}`);
+
+      if (file > 0) {
+        const captureLeftPos = coordsToSquare(file - 1, rank + 1);
+        const captureLeftPiece = getPieceAt(board, captureLeftPos);
+        if (captureLeftPiece && getPieceOwner(captureLeftPiece) === "black") {
+          moves.push(captureLeftPos);
+        }
+      }
+
+      if (file < 7) {
+        const captureRightPos = coordsToSquare(file + 1, rank + 1);
+        const captureRightPiece = getPieceAt(board, captureRightPos);
+        if (captureRightPiece && getPieceOwner(captureRightPiece) === "black") {
+          moves.push(captureRightPos);
+        }
+      }
+    }
+  } else {
+    if (rank > 0) {
+      const forwardPos = coordsToSquare(file, rank - 1);
+      if (isSquareEmpty(board, forwardPos)) {
+        moves.push(forwardPos);
+        if (rank === 6) {
+          const doubleForwardPos = coordsToSquare(file, rank - 2);
+          if (isSquareEmpty(board, doubleForwardPos)) {
+            moves.push(doubleForwardPos);
+          }
+        }
+      }
+
+      if (file > 0) {
+        const captureLeftPos = coordsToSquare(file - 1, rank - 1);
+        const captureLeftPiece = getPieceAt(board, captureLeftPos);
+        if (captureLeftPiece && getPieceOwner(captureLeftPiece) === "white") {
+          moves.push(captureLeftPos);
+        }
+      }
+
+      if (file < 7) {
+        const captureRightPos = coordsToSquare(file + 1, rank - 1);
+        const captureRightPiece = getPieceAt(board, captureRightPos);
+        if (captureRightPiece && getPieceOwner(captureRightPiece) === "white") {
+          moves.push(captureRightPos);
+        }
+      }
+    }
   }
+
+  if (enPassantTarget) {
+    const [targetFile, targetRank] = squareToCoords(enPassantTarget);
+    const forward = pieceOwner === "white" ? 1 : -1;
+    if (targetRank === rank + forward && Math.abs(targetFile - file) === 1) {
+      moves.push(enPassantTarget);
+    }
+  }
+
   return moves;
 };
 
-const getAttackSquares = (board: Board, position: Position): Position[] => {
-  const piece = getPieceAt(board, position);
+const getPossibleRookMoves = (board: Board, square: Square): Square[] => {
+  const rookDirections: [number, number][] = [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+  ];
+
+  return getLinearMoves(board, square, rookDirections);
+};
+
+const getPossibleKnightMoves = (board: Board, square: Square): Square[] => {
+  const knightMoves: [number, number][] = [
+    [2, 1],
+    [2, -1],
+    [-2, 1],
+    [-2, -1],
+    [1, 2],
+    [1, -2],
+    [-1, 2],
+    [-1, -2],
+  ];
+
+  return getSingleMoves(board, square, knightMoves);
+};
+
+const getPossibleBishopMoves = (board: Board, square: Square): Square[] => {
+  const bishopDirections: [number, number][] = [
+    [1, 1],
+    [1, -1],
+    [-1, 1],
+    [-1, -1],
+  ];
+
+  return getLinearMoves(board, square, bishopDirections);
+};
+
+const getPossibleQueenMoves = (board: Board, square: Square): Square[] => {
+  const queenDirections: [number, number][] = [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+    [1, 1],
+    [1, -1],
+    [-1, 1],
+    [-1, -1],
+  ];
+
+  return getLinearMoves(board, square, queenDirections);
+};
+
+const getPossibleKingMoves = (game: GameState, square: Square, pieceOwner: Player): Square[] => {
+  const board = game.board;
+  const canKingsideCastle = canCastleKingside(game, pieceOwner);
+  const canQueensideCastle = canCastleQueenside(game, pieceOwner);
+  const opponent = getOpponent(pieceOwner);
+  const kingMoves: [number, number][] = [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+    [1, 1],
+    [1, -1],
+    [-1, 1],
+    [-1, -1],
+  ];
+
+  const safeKingMoves = getSingleMoves(board, square, kingMoves).filter((target) => {
+    return isKingMoveSafe(board, square, target, pieceOwner);
+  });
+
+  if (pieceOwner === "white") {
+    if (
+      canKingsideCastle
+      && getPieceAt(board, "e1") === "white king"
+      && getPieceAt(board, "h1") === "white rook"
+      && isSquareEmpty(board, "f1")
+      && isSquareEmpty(board, "g1")
+      && !isSquareAttacked(board, "e1", opponent)
+      && !isSquareAttacked(board, "f1", opponent)
+      && !isSquareAttacked(board, "g1", opponent)
+    ) {
+      safeKingMoves.push("g1");
+    }
+
+    if (
+      canQueensideCastle
+      && getPieceAt(board, "e1") === "white king"
+      && getPieceAt(board, "a1") === "white rook"
+      && isSquareEmpty(board, "d1")
+      && isSquareEmpty(board, "c1")
+      && isSquareEmpty(board, "b1")
+      && !isSquareAttacked(board, "e1", opponent)
+      && !isSquareAttacked(board, "d1", opponent)
+      && !isSquareAttacked(board, "c1", opponent)
+    ) {
+      safeKingMoves.push("c1");
+    }
+  } else {
+    if (
+      canKingsideCastle
+      && getPieceAt(board, "e8") === "black king"
+      && getPieceAt(board, "h8") === "black rook"
+      && isSquareEmpty(board, "f8")
+      && isSquareEmpty(board, "g8")
+      && !isSquareAttacked(board, "e8", opponent)
+      && !isSquareAttacked(board, "f8", opponent)
+      && !isSquareAttacked(board, "g8", opponent)
+    ) {
+      safeKingMoves.push("g8");
+    }
+
+    if (
+      canQueensideCastle
+      && getPieceAt(board, "e8") === "black king"
+      && getPieceAt(board, "a8") === "black rook"
+      && isSquareEmpty(board, "d8")
+      && isSquareEmpty(board, "c8")
+      && isSquareEmpty(board, "b8")
+      && !isSquareAttacked(board, "e8", opponent)
+      && !isSquareAttacked(board, "d8", opponent)
+      && !isSquareAttacked(board, "c8", opponent)
+    ) {
+      safeKingMoves.push("c8");
+    }
+  }
+
+  return safeKingMoves;
+};
+
+export const getPossibleMoves = (game: GameState, square: Square): Square[] => {
+  const piece = getPieceAt(game.board, square);
   if (!piece) return [];
 
-  const [file, rank] = positionToCoords(position);
+  const { pieceOwner, pieceType } = getPieceInfo(piece);
+
+  switch (pieceType) {
+    case "pawn":
+      return getPossiblePawnMoves(game, square, pieceOwner);
+    case "rook":
+      return getPossibleRookMoves(game.board, square);
+    case "knight":
+      return getPossibleKnightMoves(game.board, square);
+    case "bishop":
+      return getPossibleBishopMoves(game.board, square);
+    case "queen":
+      return getPossibleQueenMoves(game.board, square);
+    case "king":
+      return getPossibleKingMoves(game, square, pieceOwner);
+    default:
+      throw new Error(`Unknown piece type: ${pieceType}`);
+  }
+};
+
+const getAttackSquares = (board: Board, square: Square): Square[] => {
+  const piece = getPieceAt(board, square);
+  if (!piece) return [];
+
+  const [file, rank] = squareToCoords(square);
   const { pieceOwner, pieceType } = getPieceInfo(piece);
 
   switch (pieceType) {
     case "pawn": {
       const dir = pieceOwner === "white" ? 1 : -1;
-      const targets: Position[] = [];
+      const targets: Square[] = [];
 
       if (file > 0 && rank + dir >= 0 && rank + dir < 8) {
-        targets.push(coordsToPosition(file - 1, rank + dir));
+        targets.push(coordsToSquare(file - 1, rank + dir));
       }
       if (file < 7 && rank + dir >= 0 && rank + dir < 8) {
-        targets.push(coordsToPosition(file + 1, rank + dir));
+        targets.push(coordsToSquare(file + 1, rank + dir));
       }
 
       return targets;
@@ -439,13 +389,13 @@ const getAttackSquares = (board: Board, position: Position): Position[] => {
         [-1, 2],
         [-1, -2],
       ];
-      const targets: Position[] = [];
+      const targets: Square[] = [];
 
       for (const [fileDir, rankDir] of knightMoves) {
         const newFile = file + fileDir;
         const newRank = rank + rankDir;
         if (newFile >= 0 && newFile < 8 && newRank >= 0 && newRank < 8) {
-          targets.push(coordsToPosition(newFile, newRank));
+          targets.push(coordsToSquare(newFile, newRank));
         }
       }
 
@@ -462,34 +412,34 @@ const getAttackSquares = (board: Board, position: Position): Position[] => {
         [-1, 1],
         [-1, -1],
       ];
-      const targets: Position[] = [];
+      const targets: Square[] = [];
 
       for (const [fileDir, rankDir] of kingMoves) {
         const newFile = file + fileDir;
         const newRank = rank + rankDir;
         if (newFile >= 0 && newFile < 8 && newRank >= 0 && newRank < 8) {
-          targets.push(coordsToPosition(newFile, newRank));
+          targets.push(coordsToSquare(newFile, newRank));
         }
       }
 
       return targets;
     }
     case "rook":
-      return getLinearAttackSquares(board, position, [
+      return getLinearAttackSquares(board, square, [
         [1, 0],
         [-1, 0],
         [0, 1],
         [0, -1],
       ]);
     case "bishop":
-      return getLinearAttackSquares(board, position, [
+      return getLinearAttackSquares(board, square, [
         [1, 1],
         [1, -1],
         [-1, 1],
         [-1, -1],
       ]);
     case "queen":
-      return getLinearAttackSquares(board, position, [
+      return getLinearAttackSquares(board, square, [
         [1, 0],
         [-1, 0],
         [0, 1],
@@ -504,9 +454,9 @@ const getAttackSquares = (board: Board, position: Position): Position[] => {
   }
 };
 
-const getLinearAttackSquares = (board: Board, position: Position, directions: [number, number][]): Position[] => {
-  const [file, rank] = positionToCoords(position);
-  const targets: Position[] = [];
+const getLinearAttackSquares = (board: Board, square: Square, directions: [number, number][]): Square[] => {
+  const [file, rank] = squareToCoords(square);
+  const targets: Square[] = [];
 
   for (const [fileDir, rankDir] of directions) {
     for (let i = 1; i < 8; i++) {
@@ -517,10 +467,10 @@ const getLinearAttackSquares = (board: Board, position: Position, directions: [n
         break;
       }
 
-      const target = coordsToPosition(newFile, newRank);
+      const target = coordsToSquare(newFile, newRank);
       targets.push(target);
 
-      if (!isPositionEmpty(board, target)) {
+      if (!isSquareEmpty(board, target)) {
         break;
       }
     }
@@ -529,26 +479,26 @@ const getLinearAttackSquares = (board: Board, position: Position, directions: [n
   return targets;
 };
 
-const getKingPosition = (board: Board, player: Player): Position | null => {
+const getKingPosition = (board: Board, player: Player): Square | null => {
   const king = `${player} king` as Piece;
 
-  for (const position of positions) {
-    if (getPieceAt(board, position) === king) {
-      return position;
+  for (const square of SQUARES) {
+    if (getPieceAt(board, square) === king) {
+      return square;
     }
   }
 
   return null;
 };
 
-const isSquareAttacked = (board: Board, square: Position, attacker: Player): boolean => {
-  for (const position of positions) {
-    const piece = getPieceAt(board, position);
+const isSquareAttacked = (board: Board, square: Square, attacker: Player): boolean => {
+  for (const sourceSquare of SQUARES) {
+    const piece = getPieceAt(board, sourceSquare);
     if (!piece || getPieceOwner(piece) !== attacker) {
       continue;
     }
 
-    const attacked = getAttackSquares(board, position);
+    const attacked = getAttackSquares(board, sourceSquare);
     if (attacked.includes(square)) {
       return true;
     }
@@ -566,90 +516,10 @@ const isPlayerInCheckOnBoard = (board: Board, player: Player): boolean => {
   return isSquareAttacked(board, kingPos, getOpponent(player));
 };
 
-const getSpecialMoves = (game: GameState, position: Position): Position[] => {
-  const piece = getPieceAt(game.board, position);
-  if (!piece) return [];
-
-  const { pieceOwner, pieceType } = getPieceInfo(piece);
-  const [file, rank] = positionToCoords(position);
-  const flags = getGameFlags(game);
-  const specialMoves: Position[] = [];
-
-  if (pieceType === "pawn" && flags.enPassantTarget) {
-    const [targetFile, targetRank] = positionToCoords(flags.enPassantTarget);
-    const forward = pieceOwner === "white" ? 1 : -1;
-    if (targetRank === rank + forward && Math.abs(targetFile - file) === 1) {
-      specialMoves.push(flags.enPassantTarget);
-    }
-  }
-
-  if (pieceType === "king") {
-    const opponent = getOpponent(pieceOwner);
-
-    if (pieceOwner === "white") {
-      if (
-        flags.whiteCanCastleKingside
-        && getPieceAt(game.board, "e1") === "white king"
-        && getPieceAt(game.board, "h1") === "white rook"
-        && isPositionEmpty(game.board, "f1")
-        && isPositionEmpty(game.board, "g1")
-        && !isSquareAttacked(game.board, "e1", opponent)
-        && !isSquareAttacked(game.board, "f1", opponent)
-        && !isSquareAttacked(game.board, "g1", opponent)
-      ) {
-        specialMoves.push("g1");
-      }
-
-      if (
-        flags.whiteCanCastleQueenside
-        && getPieceAt(game.board, "e1") === "white king"
-        && getPieceAt(game.board, "a1") === "white rook"
-        && isPositionEmpty(game.board, "d1")
-        && isPositionEmpty(game.board, "c1")
-        && isPositionEmpty(game.board, "b1")
-        && !isSquareAttacked(game.board, "e1", opponent)
-        && !isSquareAttacked(game.board, "d1", opponent)
-        && !isSquareAttacked(game.board, "c1", opponent)
-      ) {
-        specialMoves.push("c1");
-      }
-    } else {
-      if (
-        flags.blackCanCastleKingside
-        && getPieceAt(game.board, "e8") === "black king"
-        && getPieceAt(game.board, "h8") === "black rook"
-        && isPositionEmpty(game.board, "f8")
-        && isPositionEmpty(game.board, "g8")
-        && !isSquareAttacked(game.board, "e8", opponent)
-        && !isSquareAttacked(game.board, "f8", opponent)
-        && !isSquareAttacked(game.board, "g8", opponent)
-      ) {
-        specialMoves.push("g8");
-      }
-
-      if (
-        flags.blackCanCastleQueenside
-        && getPieceAt(game.board, "e8") === "black king"
-        && getPieceAt(game.board, "a8") === "black rook"
-        && isPositionEmpty(game.board, "d8")
-        && isPositionEmpty(game.board, "c8")
-        && isPositionEmpty(game.board, "b8")
-        && !isSquareAttacked(game.board, "e8", opponent)
-        && !isSquareAttacked(game.board, "d8", opponent)
-        && !isSquareAttacked(game.board, "c8", opponent)
-      ) {
-        specialMoves.push("c8");
-      }
-    }
-  }
-
-  return specialMoves;
-};
-
 const createMove = (
   game: GameState,
-  from: Position,
-  to: Position,
+  from: Square,
+  to: Square,
   evaluateCheckmate: boolean = true,
 ): Move | null => {
   const piece = getPieceAt(game.board, from);
@@ -657,22 +527,22 @@ const createMove = (
 
   const pieceOwner = getPieceOwner(piece);
   const pieceType = getPieceType(piece);
-  const flags = getGameFlags(game);
+  const enPassantTarget = getEnPassantTarget(game);
   let capturedPiece = getPieceAt(game.board, to);
-  let capturedPosition: Position | null = capturedPiece ? to : null;
+  let capturedPosition: Square | null = capturedPiece ? to : null;
   let isEnPassant = false;
 
   if (
     pieceType === "pawn"
-    && flags.enPassantTarget
-    && to === flags.enPassantTarget
+    && enPassantTarget
+    && to === enPassantTarget
     && !capturedPiece
     && from[0] !== to[0]
   ) {
     isEnPassant = true;
-    const [toFile, toRank] = positionToCoords(to);
+    const [toFile, toRank] = squareToCoords(to);
     const capturedRank = pieceOwner === "white" ? toRank - 1 : toRank + 1;
-    capturedPosition = coordsToPosition(toFile, capturedRank);
+    capturedPosition = coordsToSquare(toFile, capturedRank);
     capturedPiece = getPieceAt(game.board, capturedPosition);
   }
 
@@ -764,18 +634,15 @@ const applyMoveToBoard = (board: Board, move: Move): Board => {
   return newBoard;
 };
 
-export const getLegalMovesForPosition = (game: GameState, position: Position): Position[] => {
-  const piece = getPieceAt(game.board, position);
+export const getLegalMovesForSquare = (game: GameState, square: Square): Square[] => {
+  const piece = getPieceAt(game.board, square);
   if (!piece) return [];
 
   const owner = getPieceOwner(piece);
-  const pseudoMoves = [
-    ...getPossibleMoves(game.board, position),
-    ...getSpecialMoves(game, position),
-  ];
+  const pseudoMoves = getPossibleMoves(game, square);
 
   return pseudoMoves.filter((to) => {
-    const move = createMove(game, position, to, false);
+    const move = createMove(game, square, to, false);
     if (!move) return false;
 
     const nextBoard = applyMoveToBoard(game.board, move);
@@ -783,8 +650,8 @@ export const getLegalMovesForPosition = (game: GameState, position: Position): P
   });
 };
 
-export const makeMove = (game: GameState, from: Position, to: Position): GameState | null => {
-  const legalMoves = getLegalMovesForPosition(game, from);
+export const makeMove = (game: GameState, from: Square, to: Square): GameState | null => {
+  const legalMoves = getLegalMovesForSquare(game, from);
   if (!legalMoves.includes(to)) {
     return null;
   }
@@ -805,13 +672,13 @@ export const isPlayerInCheck = (game: GameState, player: Player): boolean => {
 };
 
 export const hasAnyLegalMove = (game: GameState, player: Player): boolean => {
-  for (const position of positions) {
-    const piece = getPieceAt(game.board, position);
+  for (const square of SQUARES) {
+    const piece = getPieceAt(game.board, square);
     if (!piece || getPieceOwner(piece) !== player) {
       continue;
     }
 
-    const legalMoves = getLegalMovesForPosition(game, position);
+    const legalMoves = getLegalMovesForSquare(game, square);
     if (legalMoves.length > 0) {
       return true;
     }
@@ -826,19 +693,19 @@ export const isCheckmate = (game: GameState, player: Player): boolean => {
 
 // Helper functions
 
-const getLinearMoves = (board: Board, position: Position, directions: [number, number][]): Position[] => {
-  const [file, rank] = positionToCoords(position);
-  const piece = getPieceAt(board, position);
+const getLinearMoves = (board: Board, square: Square, directions: [number, number][]): Square[] => {
+  const [file, rank] = squareToCoords(square);
+  const piece = getPieceAt(board, square);
   if (!piece) return [];
   const pieceOwner = getPieceOwner(piece);
-  const moves: Position[] = [];
+  const moves: Square[] = [];
   for (const [fileDir, rankDir] of directions) {
     for (let i = 1; i < 8; i++) {
       const newFile = file + fileDir * i;
       const newRank = rank + rankDir * i;
       if (newFile >= 0 && newFile < 8 && newRank >= 0 && newRank < 8) {
-        const pos = coordsToPosition(newFile, newRank);
-        if (isPositionEmpty(board, pos)) {
+        const pos = coordsToSquare(newFile, newRank);
+        if (isSquareEmpty(board, pos)) {
           moves.push(pos);
         }
         else {
@@ -855,18 +722,18 @@ const getLinearMoves = (board: Board, position: Position, directions: [number, n
   return moves;
 };
 
-const getSingleMoves = (board: Board, position: Position, moveOffsets: [number, number][]): Position[] => {
-  const [file, rank] = positionToCoords(position);
-  const piece = getPieceAt(board, position);
+const getSingleMoves = (board: Board, square: Square, moveOffsets: [number, number][]): Square[] => {
+  const [file, rank] = squareToCoords(square);
+  const piece = getPieceAt(board, square);
   if (!piece) return [];
   const pieceOwner = getPieceOwner(piece);
-  const validMoves: Position[] = [];
+  const validMoves: Square[] = [];
   for (const [fileDir, rankDir] of moveOffsets) {
     const newFile = file + fileDir;
     const newRank = rank + rankDir;
     if (newFile >= 0 && newFile < 8 && newRank >= 0 && newRank < 8) {
-      const pos = coordsToPosition(newFile, newRank);
-      if (isPositionEmpty(board, pos) || getPieceOwner(board.get(pos)!) !== pieceOwner) {
+      const pos = coordsToSquare(newFile, newRank);
+      if (isSquareEmpty(board, pos) || getPieceOwner(board.get(pos)!) !== pieceOwner) {
         validMoves.push(pos);
       }
     }
@@ -894,3 +761,4 @@ export const formatMove = (move: Move): string => {
   
   return `${pieceChar}${captureChar}${move.to}${promotionChar}${checkChar}`;
 };
+

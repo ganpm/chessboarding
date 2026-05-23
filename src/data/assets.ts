@@ -1,4 +1,4 @@
-import { type Piece } from "@/data/game";
+import { type Piece } from "@/data/piece";
 
 import blackBishop from "@/assets/black-bishop.svg";
 import blackKing from "@/assets/black-king.svg";

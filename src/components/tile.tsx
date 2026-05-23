@@ -1,10 +1,12 @@
 import {
   type SquareColor,
+} from "@/data/square";
+import {
   type Piece,
-} from "@/data/game";
+} from "@/data/piece";
 import { assets } from "@/data/assets";
 
-interface SquareProps extends React.HTMLAttributes<HTMLDivElement> {
+interface TileProps extends React.HTMLAttributes<HTMLDivElement> {
   color: SquareColor;
   piece: Piece | null;
   selected?: boolean;
@@ -13,7 +15,7 @@ interface SquareProps extends React.HTMLAttributes<HTMLDivElement> {
   ghostPiece?: Piece | null;
 }
 
-export const Square = ({
+export const Tile = ({
   color,
   piece,
   selected = false,
@@ -21,11 +23,12 @@ export const Square = ({
   captureTarget = false,
   ghostPiece = null,
   ...props
-}: SquareProps) => {
+}: TileProps) => {
   const bg = {
     dark: "bg-[#B58863]",
     light: "bg-[#F0D9B5]",
-  }
+  };
+
   return (
     <div
       className={`group relative h-25 w-25 ${bg[color]} ${selected ? "ring-8 ring-inset ring-yellow-400" : ""} ${legalMove ? "cursor-pointer" : ""}`}
@@ -55,11 +58,11 @@ export const Square = ({
         <img
           src={assets[piece]}
           style={{ imageRendering: "crisp-edges" }}
-          className={`relative z-10 w-full h-full select-none cursor-pointer ${captureTarget ? "group-hover:opacity-0" : ""}`}
+          className={`relative z-10 h-full w-full cursor-pointer select-none ${captureTarget ? "group-hover:opacity-0" : ""}`}
           alt={piece}
           draggable={true}
         />
       )}
     </div>
   );
-}
+};

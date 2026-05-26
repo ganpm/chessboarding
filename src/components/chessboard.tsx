@@ -14,6 +14,11 @@ interface ChessboardProps extends React.HTMLAttributes<HTMLDivElement> {
   board: Board;
   onTileClick: (square: Square) => void;
   onTileHover: (square: Square | null) => void;
+  onPieceDragStart: (square: Square, event: React.DragEvent<HTMLImageElement>) => void;
+  onPieceDragEnd: () => void;
+  onTileDragOver: (square: Square, event: React.DragEvent<HTMLDivElement>) => void;
+  onTileDrop: (square: Square, event: React.DragEvent<HTMLDivElement>) => void;
+  dragOverSquare: Square | null;
   selectedSquare: Square | null;
   legalMoves: Square[];
   previewPiece: Piece | null;
@@ -29,6 +34,11 @@ export const Chessboard = ({
   board,
   onTileClick,
   onTileHover,
+  onPieceDragStart,
+  onPieceDragEnd,
+  onTileDragOver,
+  onTileDrop,
+  dragOverSquare,
   selectedSquare,
   legalMoves,
   previewPiece,
@@ -41,6 +51,7 @@ export const Chessboard = ({
         const isSelected = selectedSquare === square;
         const isLegalMove = legalMoves.includes(square);
         const isCaptureTarget = isLegalMove && !!piece;
+        const isDragOver = dragOverSquare === square;
 
         return (
           <Tile
@@ -50,10 +61,15 @@ export const Chessboard = ({
             selected={isSelected}
             legalMove={isLegalMove}
             captureTarget={isCaptureTarget}
+            dragOver={isDragOver}
             ghostPiece={isLegalMove ? previewPiece : null}
             onClick={() => onTileClick(square)}
             onMouseEnter={() => onTileHover(square)}
             onMouseLeave={() => onTileHover(null)}
+            onDragOver={(event) => onTileDragOver(square, event)}
+            onDrop={(event) => onTileDrop(square, event)}
+            onPieceDragStart={(event) => onPieceDragStart(square, event)}
+            onPieceDragEnd={onPieceDragEnd}
           />
         );
       })}

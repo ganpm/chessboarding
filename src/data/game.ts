@@ -516,7 +516,7 @@ const isPlayerInCheckOnBoard = (board: Board, player: Player): boolean => {
   return isSquareAttacked(board, kingPos, getOpponent(player));
 };
 
-const createMove = (
+export const createMove = (
   game: GameState,
   from: Square,
   to: Square,
@@ -650,17 +650,7 @@ export const getLegalMovesForSquare = (game: GameState, square: Square): Square[
   });
 };
 
-export const makeMove = (game: GameState, from: Square, to: Square): GameState | null => {
-  const legalMoves = getLegalMovesForSquare(game, from);
-  if (!legalMoves.includes(to)) {
-    return null;
-  }
-
-  const move = createMove(game, from, to);
-  if (!move) {
-    return null;
-  }
-
+export const makeMove = (game: GameState, move: Move): GameState => {
   return {
     board: applyMoveToBoard(game.board, move),
     moves: [...game.moves, move],

@@ -83,12 +83,17 @@ export const initialBoard: Board = new Map<Square, Piece | null>([
   ["h8", "black rook"],
 ]);
 
-const FILE_TO_COORD: Record<string, number> = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 };
+const FILE_TO_COORD: Record<string, number> = { "a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7 };
 const RANK_TO_COORD: Record<string, number> = { "1": 0, "2": 1, "3": 2, "4": 3, "5": 4, "6": 5, "7": 6, "8": 7 };
 
 export const squareToCoords = (square: Square): [number, number] => {
   const file = square[0];
   const rank = square[1];
+
+  if (FILE_TO_COORD[file] === undefined || RANK_TO_COORD[rank] === undefined) {
+    throw new Error(`Invalid square: ${square}`);
+  }
+
   return [FILE_TO_COORD[file], RANK_TO_COORD[rank]];
 };
 
@@ -96,11 +101,14 @@ const COORD_TO_FILE: Record<number, string> = { 0: "a", 1: "b", 2: "c", 3: "d", 
 const COORD_TO_RANK: Record<number, string> = { 0: "1", 1: "2", 2: "3", 3: "4", 4: "5", 5: "6", 6: "7", 7: "8" };
 
 export const coordsToSquare = (file: number, rank: number): Square => {
-  if (!COORD_TO_FILE[file] || !COORD_TO_RANK[rank]) {
+  const fileStr = COORD_TO_FILE[file];
+  const rankStr = COORD_TO_RANK[rank];
+
+  if (fileStr === undefined || rankStr === undefined) {
     throw new Error(`Invalid coordinates: (${file}, ${rank})`);
   }
 
-  return `${COORD_TO_FILE[file]}${COORD_TO_RANK[rank]}` as Square;
+  return `${fileStr}${rankStr}` as Square;
 };
 
 export const getPieceAt = (board: Board, square: Square): Piece | null => {
@@ -108,5 +116,5 @@ export const getPieceAt = (board: Board, square: Square): Piece | null => {
 };
 
 export const isSquareEmpty = (board: Board, square: Square): boolean => {
-  return !board.get(square);
+  return board.get(square) === null;
 };

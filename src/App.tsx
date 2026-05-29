@@ -173,7 +173,7 @@ function App() {
     : null;
 
   return (
-    <div className="flex h-128 justify-center items-start gap-5 my-20">
+    <div className="flex h-128 justify-center items-start gap-5 my-15">
       <Chessboard
         board={game.board}
         onTileClick={handleTileClick}

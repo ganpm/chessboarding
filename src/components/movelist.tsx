@@ -25,11 +25,11 @@ export const Movelist = ({ moves, className, ...props }: MovelistProps) => {
 
   return (
     <section
-      className={`w-full h-full max-w-xs rounded-md border border-zinc-300 bg-zinc-50 shadow-sm ${className ?? ""}`}
+      className={`w-full h-200 max-w-xs rounded-md border border-zinc-300 bg-zinc-50 shadow-sm ${className ?? ""}`}
       {...props}
     >
       <header className="border-b border-zinc-300 px-3 py-2">
-        <h2 className="text-sm font-semibold tracking-wide text-zinc-800">Move List</h2>
+        <h2 className="font-semibold tracking-wide text-zinc-800">Move List</h2>
       </header>
 
       <div className="grid grid-cols-[80px_1fr_1fr] items-center gap-x-2 border-b border-zinc-300 bg-zinc-100 px-3 py-2 text-xs font-medium uppercase tracking-wide text-zinc-600">
@@ -38,15 +38,15 @@ export const Movelist = ({ moves, className, ...props }: MovelistProps) => {
         <span>Black</span>
       </div>
 
-      <div className="max-h-96 overflow-y-auto px-3 py-2">
+      <div className="overflow-y-auto px-3 py-2">
         {rounds.length === 0 ? (
-          <p className="text-center text-sm text-zinc-500">No moves yet.</p>
+          <p className="text-center text-zinc-500">No moves yet.</p>
         ) : (
           <ol className="space-y-1">
             {rounds.map((round, index) => (
               <li
                 key={`round-${index + 1}`}
-                className="grid grid-cols-[80px_1fr_1fr] items-center gap-x-2 rounded px-1 py-1 text-sm text-zinc-800 odd:bg-zinc-100"
+                className="grid grid-cols-[80px_1fr_1fr] items-center gap-x-2 rounded px-1 py-1 text-zinc-800 odd:bg-zinc-100"
               >
                 <span className="font-mono text-zinc-600">{index + 1}.</span>
                 <span className="font-mono">{formatMove(round.white)}</span>

@@ -745,8 +745,16 @@ export const formatMove = (move: Move): string => {
     return `O-O-O${checkChar}`;
   }
 
-  const pieceChar = pieceType !== "pawn" ? pieceType[0].toUpperCase()
-    : (isCapture ? move.from[0].toLowerCase() : "");
+  const PIECE_SYMBOLS: Record<PieceType, string> = {
+    pawn: "",
+    knight: "N",
+    bishop: "B",
+    rook: "R",
+    queen: "Q",
+    king: "K",
+  };
+
+  const pieceChar = pieceType !== "pawn" ? PIECE_SYMBOLS[pieceType] : (isCapture ? move.from[0].toLowerCase() : "");
   const captureChar = isCapture ? "x" : "";
   
   return `${pieceChar}${captureChar}${move.to}${promotionChar}${checkChar}`;

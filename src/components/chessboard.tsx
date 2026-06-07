@@ -2,13 +2,10 @@
 import { Tile } from "@/components/tile";
 import {
   type SquareColor,
-  type Board,
-  type Square,
-  SQUARES,
-} from "@/data/square";
-import {
-  type Piece,
-} from "@/data/piece";
+  Square,
+} from "@/game/square";
+import { Board } from "@/game/board";
+import { Piece } from "@/game/piece";
 
 interface ChessboardProps extends React.HTMLAttributes<HTMLDivElement> {
   board: Board;
@@ -45,9 +42,9 @@ export const Chessboard = ({
   ...props
 }: ChessboardProps) => {
   return (
-    <div className="grid grid-flow-col grid-cols-8 grid-rows-8 gap-0 shadow-md" {...props}>
-      {SQUARES.map((square, index) => {
-        const piece = board.get(square) || null;
+    <div className="grid grid-flow-row grid-cols-8 grid-rows-8 gap-0 shadow-md" {...props}>
+      {Square.whitePerspective.map((square, index) => {
+        const piece = board.pieceAt(square);
         const isSelected = selectedSquare === square;
         const isLegalMove = legalMoves.includes(square);
         const isCaptureTarget = isLegalMove && !!piece;
@@ -55,7 +52,7 @@ export const Chessboard = ({
 
         return (
           <Tile
-            key={square}
+            key={square.toString()}
             color={indexColor(index)}
             piece={piece}
             selected={isSelected}

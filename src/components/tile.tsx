@@ -1,10 +1,8 @@
 import {
   type SquareColor,
-} from "@/data/square";
-import {
-  type Piece,
-} from "@/data/piece";
-import { assets } from "@/data/assets";
+} from "@/game/square";
+import { Piece } from "@/game/piece";
+import { assets } from "@/game/assets";
 
 interface TileProps extends React.HTMLAttributes<HTMLDivElement> {
   color: SquareColor;
@@ -52,20 +50,20 @@ export const Tile = ({
 
       {legalMove && ghostPiece && (
         <img
-          src={assets[ghostPiece]}
+          src={assets[ghostPiece.toString()]}
           style={{ imageRendering: "smooth" }}
           className={`pointer-events-none absolute inset-0 z-20 h-full w-full select-none transition-opacity duration-150 ${dragOver ? "opacity-45" : "opacity-0 group-hover:opacity-45"}`}
-          alt={`${ghostPiece} ghost preview`}
+          alt={`${ghostPiece.toString()} ghost preview`}
           draggable={false}
         />
       )}
 
       {piece && (
         <img
-          src={assets[piece]}
+          src={assets[piece.toString()]}
           style={{ imageRendering: "crisp-edges" }}
           className={`relative z-10 h-full w-full cursor-pointer select-none ${captureTarget ? (dragOver ? "opacity-0" : "group-hover:opacity-0") : ""}`}
-          alt={piece}
+          alt={piece.toString()}
           draggable={true}
           onDragStart={onPieceDragStart}
           onDragEnd={onPieceDragEnd}

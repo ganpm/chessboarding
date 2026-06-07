@@ -4,48 +4,36 @@ import { Chessboard } from "@/components/chessboard"
 import { Movelist } from "@/components/movelist"
 
 import {
-  type GameState,
-  type Square,
-  initialBoard,
-  getPieceAt,
-  getPieceOwner,
-  getCurrentPlayer,
-  getLegalMovesForSquare,
-  createMove,
-  makeMove,
-} from "@/data/game";
+  Square,
+} from "@/game/square";
+import { Position } from "@/game/position";
 
 function App() {
-  const [game, setGame] = useState<GameState>({
-    board: initialBoard,
-    moves: [],
-  });
+  const [game, setGame] = useState<Position>(Position.init());
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [hoveredSquare, setHoveredSquare] = useState<Square | null>(null);
   const [draggedFromSquare, setDraggedFromSquare] = useState<Square | null>(null);
   const [dragOverSquare, setDragOverSquare] = useState<Square | null>(null);
 
   const handleTileClick = (square: Square) => {
-    const currentPlayer = getCurrentPlayer(game.moves);
-    const piece = getPieceAt(game.board, square);
+    const currentPlayer = game.currentPlayerToMove();
+    const piece = game.board.pieceAt(square);
 
     // If there is already a selected square...
     if (selectedSquare) {
 
       // If the clicked square is a legal move for the selected piece, make the move
-      const legalMoves = getLegalMovesForSquare(game, selectedSquare);
-      if (legalMoves.includes(square)) {
-        const move = createMove(game, selectedSquare, square);
-        if (move) {
-          setGame((prev) => makeMove(prev, move));
-          setSelectedSquare(null);
-          setHoveredSquare(null);
-          return;
-        }
+      const legalMoves = game.getLegalMovesForSquare(selectedSquare);
+      const move = legalMoves.find((candidate) => candidate.targetSquare === square);
+      if (move) {
+        setGame((prev) => prev.applyMove(move));
+        setSelectedSquare(null);
+        setHoveredSquare(null);
+        return;
       }
 
       // Otherwise, if the clicked square has a piece belonging to the current player, select it instead
-      if (piece && getPieceOwner(piece) === currentPlayer) {
+      if (piece && piece.owner.is(currentPlayer)) {
         setSelectedSquare(square);
         setHoveredSquare(null);
         return;
@@ -58,7 +46,7 @@ function App() {
     }
 
     // If there is no selected square, and the clicked square has a piece belonging to the current player, select it
-    if (piece && getPieceOwner(piece) === currentPlayer) {
+    if (piece && piece.owner.is(currentPlayer)) {
       setSelectedSquare(square);
       setHoveredSquare(null);
     }
@@ -82,15 +70,16 @@ function App() {
 
     // If we're not hovering over a square, clear the hover state
     if (!square) {
+      setSelectedSquare(null);
       setHoveredSquare(null);
       return;
     }
 
     // If we're hovering over a square that has a piece belonging to the current player, set the hover state to that square.
-    const currentPlayer = getCurrentPlayer(game.moves);
-    const piece = getPieceAt(game.board, square);
+    const currentPlayer = game.currentPlayerToMove();
+    const piece = game.board.pieceAt(square);
 
-    if (piece && getPieceOwner(piece) === currentPlayer) {
+    if (piece && piece.owner.is(currentPlayer)) {
       setHoveredSquare(square);
       return;
     }
@@ -101,16 +90,16 @@ function App() {
 
   const handlePieceDragStart = (square: Square, event: React.DragEvent<HTMLImageElement>) => {
     // Don't allow dragging if the piece doesn't belong to the current player
-    const piece = getPieceAt(game.board, square);
-    const currentPlayer = getCurrentPlayer(game.moves);
+    const piece = game.board.pieceAt(square);
+    const currentPlayer = game.currentPlayerToMove();
 
-    if (!piece || getPieceOwner(piece) !== currentPlayer) {
+    if (!piece || !piece.owner.is(currentPlayer)) {
       event.preventDefault();
       return;
     }
 
     event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", square);
+    event.dataTransfer.setData("text/plain", square.toString());
     setDraggedFromSquare(square);
     setDragOverSquare(null);
     setSelectedSquare(square);
@@ -129,8 +118,8 @@ function App() {
     }
 
     // If the dragged piece can be legally moved to the hovered square, allow the drop and set the drag over state to that square
-    const legalMoves = getLegalMovesForSquare(game, draggedFromSquare);
-    if (legalMoves.includes(square)) {
+    const legalMoves = game.getLegalMovesForSquare(draggedFromSquare);
+    if (legalMoves.some((move) => move.targetSquare === square)) {
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
       setDragOverSquare(square);
@@ -152,24 +141,22 @@ function App() {
     setDraggedFromSquare(null);
     setDragOverSquare(null);
 
-    const legalMoves = getLegalMovesForSquare(game, from);
-    if (legalMoves.includes(square)) {
-      const move = createMove(game, from, square);
-      if (move) {
-        setGame((prev) => makeMove(prev, move));
-        setSelectedSquare(null);
-        setHoveredSquare(null);
-        return;
-      }
+    const legalMoves = game.getLegalMovesForSquare(from);
+    const move = legalMoves.find((candidate) => candidate.targetSquare === square);
+    if (move) {
+      setGame((prev) => prev.applyMove(move));
+      setSelectedSquare(null);
+      setHoveredSquare(null);
+      return;
     }
   };
 
   const previewSquare = selectedSquare ?? hoveredSquare;
   const previewMoves = previewSquare
-    ? getLegalMovesForSquare(game, previewSquare)
+    ? game.getLegalMovesForSquare(previewSquare).map((move) => move.targetSquare)
     : [];
   const previewPiece = previewSquare
-    ? getPieceAt(game.board, previewSquare)
+    ? game.board.pieceAt(previewSquare)
     : null;
 
   return (
@@ -187,7 +174,7 @@ function App() {
         legalMoves={previewMoves}
         previewPiece={previewPiece}
       />
-      <Movelist moves={game.moves} />
+      <Movelist moves={game.moveHistory} />
     </div>
   )
 }

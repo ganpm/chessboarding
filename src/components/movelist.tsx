@@ -1,7 +1,19 @@
 import {
-  type Move,
-  formatMove
-} from "@/data/game";
+  Move,
+} from "@/game/move";
+
+const formatMove = (move: Move): string => {
+  const isCastle = move.originSquare.file === 4
+    && move.originSquare.rank === move.targetSquare.rank
+    && Math.abs(move.targetSquare.file - move.originSquare.file) === 2;
+
+  if (isCastle) {
+    return move.targetSquare.file === 6 ? "O-O" : "O-O-O";
+  }
+
+  const promotionChar = move.promotion ? `=${move.promotion.toString().toUpperCase()[0]}` : "";
+  return `${move.originSquare.toString()}-${move.targetSquare.toString()}${promotionChar}`;
+};
 
 interface MovelistProps extends React.HTMLAttributes<HTMLDivElement> {
   moves: Move[];

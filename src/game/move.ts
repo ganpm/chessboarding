@@ -47,7 +47,7 @@ export class Move {
   public format(): string {
     const isCapture = this.capturedPiece!!;
     const checkSymbol = this.isCheckmate ? "#" : this.isCheck ? "+" : "";
-    const promotionSymbol = this.promotion ? `=${this.promotion.toString()}` : "";
+    const promotionSymbol = this.promotion ? `=${this.promotion.symbol()}` : "";
 
     if (this.isCastleKingside) {
       return `O-O${checkSymbol}`;

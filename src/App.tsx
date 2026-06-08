@@ -2,11 +2,20 @@ import { useState } from "react";
 
 import { Chessboard } from "@/components/chessboard"
 import { Movelist } from "@/components/movelist"
+import { PromotionPicker } from "@/components/promotion-picker"
 
 import {
   Square,
 } from "@/game/square";
 import { Position } from "@/game/position";
+import { PieceType } from "@/game/piece";
+import { Player } from "@/game/player";
+
+interface PendingPromotion {
+  originSquare: Square;
+  targetSquare: Square;
+  player: Player;
+}
 
 function App() {
   const [game, setGame] = useState<Position>(Position.init());
@@ -14,8 +23,29 @@ function App() {
   const [hoveredSquare, setHoveredSquare] = useState<Square | null>(null);
   const [draggedFromSquare, setDraggedFromSquare] = useState<Square | null>(null);
   const [dragOverSquare, setDragOverSquare] = useState<Square | null>(null);
+  const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
+
+  const isPromotionMove = (position: Position, originSquare: Square, targetSquare: Square): boolean => {
+    const piece = position.board.pieceAt(originSquare);
+    if (!piece || piece.type !== PieceType.PAWN) {
+      return false;
+    }
+
+    const promotionRank = piece.owner.is(Player.WHITE) ? 7 : 0;
+    return targetSquare.rank === promotionRank;
+  };
+
+  const applyMove = (originSquare: Square, targetSquare: Square, promotion: PieceType | null = null) => {
+    setGame((prev) => prev.makeMove(prev.createMove(originSquare, targetSquare, promotion)));
+    setSelectedSquare(null);
+    setHoveredSquare(null);
+  };
 
   const handleTileClick = (square: Square) => {
+    if (pendingPromotion) {
+      return;
+    }
+
     const currentPlayer = game.currentPlayerToMove();
     const piece = game.board.pieceAt(square);
 
@@ -26,10 +56,21 @@ function App() {
       const legalMoves = game.getLegalMovesForSquare(selectedSquare);
       const move = legalMoves.find((candidate) => candidate === square);
       if (move) {
-        // TODO: PROMOTION
-        setGame((prev) => prev.makeMove(prev.createMove(selectedSquare, move)));
-        setSelectedSquare(null);
-        setHoveredSquare(null);
+        if (isPromotionMove(game, selectedSquare, move)) {
+          const movingPiece = game.board.pieceAt(selectedSquare);
+          if (movingPiece) {
+            setPendingPromotion({
+              originSquare: selectedSquare,
+              targetSquare: move,
+              player: movingPiece.owner,
+            });
+            setSelectedSquare(null);
+            setHoveredSquare(null);
+            return;
+          }
+        }
+
+        applyMove(selectedSquare, move);
         return;
       }
 
@@ -57,6 +98,10 @@ function App() {
   };
 
   const handleTileHover = (square: Square | null) => {
+    if (pendingPromotion) {
+      return;
+    }
+
     // Don't update hover state if we're currently dragging a piece,
     // or if there is a selected square (hover only applies when no piece is selected)
     if (draggedFromSquare) {
@@ -90,6 +135,11 @@ function App() {
   };
 
   const handlePieceDragStart = (square: Square, event: React.DragEvent<HTMLImageElement>) => {
+    if (pendingPromotion) {
+      event.preventDefault();
+      return;
+    }
+
     // Don't allow dragging if the piece doesn't belong to the current player
     const piece = game.board.pieceAt(square);
     const currentPlayer = game.currentPlayerToMove();
@@ -113,6 +163,10 @@ function App() {
   };
 
   const handleTileDragOver = (square: Square, event: React.DragEvent<HTMLDivElement>) => {
+    if (pendingPromotion) {
+      return;
+    }
+
     // If we're not currently dragging a piece, do nothing
     if (!draggedFromSquare) {
       return;
@@ -132,6 +186,11 @@ function App() {
   };
 
   const handleTileDrop = (square: Square, event: React.DragEvent<HTMLDivElement>) => {
+    if (pendingPromotion) {
+      event.preventDefault();
+      return;
+    }
+
     event.preventDefault();
 
     if (!draggedFromSquare) {
@@ -145,12 +204,32 @@ function App() {
     const legalMoves = game.getLegalMovesForSquare(from);
     const move = legalMoves.find((candidate) => candidate === square);
     if (move) {
-      // TODO: PROMOTION
-      setGame((prev) => prev.makeMove(prev.createMove(from, move)));
-      setSelectedSquare(null);
-      setHoveredSquare(null);
+      if (isPromotionMove(game, from, move)) {
+        const movingPiece = game.board.pieceAt(from);
+        if (movingPiece) {
+          setPendingPromotion({
+            originSquare: from,
+            targetSquare: move,
+            player: movingPiece.owner,
+          });
+          setSelectedSquare(null);
+          setHoveredSquare(null);
+          return;
+        }
+      }
+
+      applyMove(from, move);
       return;
     }
+  };
+
+  const handlePromotionSelect = (promotion: PieceType) => {
+    if (!pendingPromotion) {
+      return;
+    }
+
+    applyMove(pendingPromotion.originSquare, pendingPromotion.targetSquare, promotion);
+    setPendingPromotion(null);
   };
 
   const previewSquare = selectedSquare ?? hoveredSquare;
@@ -177,6 +256,12 @@ function App() {
         previewPiece={previewPiece}
       />
       <Movelist moves={game.moveHistory} />
+      {pendingPromotion && (
+        <PromotionPicker
+          player={pendingPromotion.player}
+          onSelect={handlePromotionSelect}
+        />
+      )}
     </div>
   )
 }

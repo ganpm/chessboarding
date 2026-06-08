@@ -13,6 +13,7 @@ import {
 } from "@/game/move";
 
 export class Position {
+
   public readonly board: Board;
   public readonly moveHistory: Move[];
 
@@ -236,35 +237,54 @@ export class Position {
   }
 
 
-  public getLegalMovesForSquare(square: Square): Move[] {
+  public getLegalMovesForSquare(originSquare: Square): Move[] {
     const playerToMove = this.currentPlayerToMove();
-    const piece = this.board.pieceAt(square);
+    const piece = this.board.pieceAt(originSquare);
     if (!piece || piece.owner !== playerToMove) {
       return [];
     }
-    const moves: Move[] = [];
+    let targetSquares: Square[] = [];
 
     switch (piece.type) {
       case PieceType.PAWN:
-        moves.push(...PawnMove.generate(this, square));
+        targetSquares = PawnMove.generate(this, originSquare);
         break;
       case PieceType.KNIGHT:
-        moves.push(...KnightMove.generate(this, square));
+        targetSquares = KnightMove.generate(this, originSquare);
         break;
       case PieceType.BISHOP:
-        moves.push(...BishopMove.generate(this, square));
+        targetSquares = BishopMove.generate(this, originSquare);
         break;
       case PieceType.ROOK:
-        moves.push(...RookMove.generate(this, square));
+        targetSquares = RookMove.generate(this, originSquare);
         break;
       case PieceType.QUEEN:
-        moves.push(...QueenMove.generate(this, square));
+        targetSquares = QueenMove.generate(this, originSquare);
         break;
       case PieceType.KING:
-        moves.push(...KingMove.generate(this, square));
+        targetSquares = KingMove.generate(this, originSquare);
         break;
       default:
         break;
+    }
+
+    const moves: Move[] = [];
+
+    if (piece.type !== PieceType.PAWN) {
+      for (const targetSquare of targetSquares) {
+        moves.push(new Move(originSquare, targetSquare));
+      }
+    } else {
+      const promotionRank = PawnMove.PROMOTION_RANK[piece.owner.toString()];
+      for (const targetSquare of targetSquares) {
+        if (targetSquare.rank === promotionRank) {
+          for (const promotionType of PieceType.promotions) {
+            moves.push(new Move(originSquare, targetSquare, promotionType));
+          }
+        } else {
+          moves.push(new Move(originSquare, targetSquare));
+        }
+      }
     }
 
     // Remove moves that would put own king in check

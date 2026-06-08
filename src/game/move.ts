@@ -122,20 +122,14 @@ export class RookMove {
     return getLinearAttackedSquares(player, board, originSquare, RookMove.DIRECTIONS);
   }
 
-  public static generate(position: Position, originSquare: Square): Move[] {
-    const moves: Move[] = [];
+  public static generate(position: Position, originSquare: Square): Square[] {
     const piece = position.board.pieceAt(originSquare);
 
     if (!piece) {
-      return moves;
+      return [];
     }
 
-    const attackedSquares = getLinearAttackedSquares(piece.owner, position.board, originSquare, RookMove.DIRECTIONS);
-    for (const targetSquare of attackedSquares) {
-      moves.push(new Move(originSquare, targetSquare));
-    }
-
-    return moves;
+    return getLinearAttackedSquares(piece.owner, position.board, originSquare, RookMove.DIRECTIONS);
   }
 }
 
@@ -152,20 +146,14 @@ export class BishopMove {
     return getLinearAttackedSquares(player, board, originSquare, BishopMove.DIRECTIONS);
   }
 
-  public static generate(position: Position, originSquare: Square): Move[] {
-    const moves: Move[] = [];
+  public static generate(position: Position, originSquare: Square): Square[] {
     const piece = position.board.pieceAt(originSquare);
 
     if (!piece) {
-      return moves;
+      return [];
     }
 
-    const attackedSquares = getLinearAttackedSquares(piece.owner, position.board, originSquare, BishopMove.DIRECTIONS);
-    for (const targetSquare of attackedSquares) {
-      moves.push(new Move(originSquare, targetSquare));
-    }
-
-    return moves;
+    return getLinearAttackedSquares(piece.owner, position.board, originSquare, BishopMove.DIRECTIONS);
   }
 }
 
@@ -186,20 +174,14 @@ export class QueenMove {
     return getLinearAttackedSquares(player, board, originSquare, QueenMove.DIRECTIONS);
   }
 
-  public static generate(position: Position, originSquare: Square): Move[] {
-    const moves: Move[] = [];
+  public static generate(position: Position, originSquare: Square): Square[] {
     const piece = position.board.pieceAt(originSquare);
 
     if (!piece) {
-      return moves;
+      return [];
     }
 
-    const attackedSquares = getLinearAttackedSquares(piece.owner, position.board, originSquare, QueenMove.DIRECTIONS);
-    for (const targetSquare of attackedSquares) {
-      moves.push(new Move(originSquare, targetSquare));
-    }
-
-    return moves;
+    return getLinearAttackedSquares(piece.owner, position.board, originSquare, QueenMove.DIRECTIONS);
   }
 }
 
@@ -220,20 +202,14 @@ export class KnightMove {
     return getSingleAttackedSquares(player, board, originSquare, KnightMove.OFFSETS);
   }
 
-  public static generate(position: Position, originSquare: Square): Move[] {
-    const moves: Move[] = [];
+  public static generate(position: Position, originSquare: Square): Square[] {
     const piece = position.board.pieceAt(originSquare);
 
     if (!piece) {
-      return moves;
+      return [];
     }
 
-    const attackedSquares = getSingleAttackedSquares(piece.owner, position.board, originSquare, KnightMove.OFFSETS);
-    for (const targetSquare of attackedSquares) {
-      moves.push(new Move(originSquare, targetSquare));
-    }
-
-    return moves;
+    return getSingleAttackedSquares(piece.owner, position.board, originSquare, KnightMove.OFFSETS);
   }
 }
 
@@ -269,18 +245,14 @@ export class KingMove {
     return getSingleAttackedSquares(player, board, originSquare, KingMove.OFFSETS);
   }
 
-  public static generate(position: Position, originSquare: Square): Move[] {
-    const moves: Move[] = [];
+  public static generate(position: Position, originSquare: Square): Square[] {
     const piece = position.board.pieceAt(originSquare);
 
     if (!piece) {
-      return moves;
+      return [];
     }
 
-    const attackedSquares = getSingleAttackedSquares(piece.owner, position.board, originSquare, KingMove.OFFSETS);
-    for (const targetSquare of attackedSquares) {
-      moves.push(new Move(originSquare, targetSquare));
-    }
+    const targetSquares = getSingleAttackedSquares(piece.owner, position.board, originSquare, KingMove.OFFSETS);
 
     const player = piece.owner.toString();
     const opponent = piece.owner.opponent();
@@ -313,7 +285,7 @@ export class KingMove {
         const areSquaresBetweenEmpty = squaresBetween.every(square => !position.board.pieceAt(square));
         const areSquaresAttacked = squaresBetween.some(square => position.isSquareAttackedBy(opponent, square));
         if (areSquaresBetweenEmpty && !areSquaresAttacked) {
-          moves.push(new Move(kingStartingSquare, kingStartingSquare.addDelta([2, 0])));
+          targetSquares.push(kingStartingSquare.addDelta([2, 0]));
         }
       }
       // Check queenside castling
@@ -328,12 +300,12 @@ export class KingMove {
         const areSquaresBetweenEmpty = squaresBetween.every(square => !position.board.pieceAt(square));
         const areSquaresAttacked = squaresBetween.slice(0, 2).some(square => position.isSquareAttackedBy(opponent, square));
         if (areSquaresBetweenEmpty && !areSquaresAttacked) {
-          moves.push(new Move(kingStartingSquare, kingStartingSquare.addDelta([-2, 0])));
+          targetSquares.push(kingStartingSquare.addDelta([-2, 0]));
         }
       }
     }
 
-    return moves;
+    return targetSquares;
   }
 }
 
@@ -379,12 +351,12 @@ export class PawnMove {
     return getSingleAttackedSquares(player, board, originSquare, PawnMove.CAPTURE_OFFSETS[player.toString()]);
   }
 
-  public static generate(position: Position, originSquare: Square): Move[] {
-    const moves: Move[] = [];
+  public static generate(position: Position, originSquare: Square): Square[] {
+    const targetSquares: Square[] = [];
     const piece = position.board.pieceAt(originSquare);
 
     if (!piece) {
-      return moves;
+      return targetSquares;
     }
 
     const player = piece.owner.toString();
@@ -393,7 +365,7 @@ export class PawnMove {
     const attackedSquares = getSingleAttackedSquares(piece.owner, position.board, originSquare, PawnMove.CAPTURE_OFFSETS[player]);
     for (const targetSquare of attackedSquares) {
       if (position.board.pieceAt(targetSquare)?.owner.is(piece.owner.opponent())) {
-        moves.push(new Move(originSquare, targetSquare));
+        targetSquares.push(targetSquare);
       }
     }
 
@@ -403,17 +375,7 @@ export class PawnMove {
     const singleForwardTargetPiece = position.board.pieceAt(singleForwardTargetSquare);
     // If the square directly in front of the pawn is empty, it's a valid move (either normal or promotion)
     if (!singleForwardTargetPiece) {
-      const promotionRank = PawnMove.PROMOTION_RANK[player];
-      if (singleForwardTargetSquare.rank === promotionRank) {
-        // Handle forward move that results in promotion
-        for (const promotionType of PieceType.promotions) {
-          // Include every promotion option as a separate move
-          moves.push(new Move(originSquare, singleForwardTargetSquare, promotionType));
-        }
-      } else {
-        // Non-promotion forward move
-        moves.push(new Move(originSquare, singleForwardTargetSquare));
-      }
+      targetSquares.push(singleForwardTargetSquare);
     }
 
     // Handle double forward move from starting position
@@ -424,7 +386,7 @@ export class PawnMove {
     if (!doubleForwardTargetPiece && !singleForwardTargetPiece) {
       const startingRank = PawnMove.STARTING_RANK[player];
       if (originSquare.rank === startingRank) {
-        moves.push(new Move(originSquare, doubleForwardTargetSquare));
+        targetSquares.push(doubleForwardTargetSquare);
       }
     }
 
@@ -448,11 +410,11 @@ export class PawnMove {
         if (adjacentSquares.some(adjacentSquare => adjacentSquare === lastMove.targetSquare)) {
           const enPassantCaptureOffset = PawnMove.ENPASSANT_CAPTURE_OFFSETS[player];
           const enPassantTargetSquare = lastMove.targetSquare.addDelta(enPassantCaptureOffset);
-          moves.push(new Move(originSquare, enPassantTargetSquare));
+          targetSquares.push(enPassantTargetSquare);
         }
       }
     }
-    return moves;
+    return targetSquares;
   }
 
 }

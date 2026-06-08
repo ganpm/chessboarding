@@ -2,15 +2,15 @@ import { Board } from "@/game/board";
 import { Player } from "@/game/player";
 import { Square } from "@/game/square";
 import { Piece, PieceType } from "@/game/piece";
+import { Move } from "@/game/move";
 import {
-  Move,
   RookMove,
   BishopMove,
   QueenMove,
   KnightMove,
   KingMove,
   PawnMove,
-} from "@/game/move";
+} from "@/game/movegen";
 
 export class Position {
 

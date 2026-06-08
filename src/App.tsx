@@ -24,9 +24,10 @@ function App() {
 
       // If the clicked square is a legal move for the selected piece, make the move
       const legalMoves = game.getLegalMovesForSquare(selectedSquare);
-      const move = legalMoves.find((candidate) => candidate.targetSquare === square);
+      const move = legalMoves.find((candidate) => candidate === square);
       if (move) {
-        setGame((prev) => prev.applyMove(move));
+        // TODO: PROMOTION
+        setGame((prev) => prev.makeMove(prev.createMove(selectedSquare, move)));
         setSelectedSquare(null);
         setHoveredSquare(null);
         return;
@@ -119,7 +120,7 @@ function App() {
 
     // If the dragged piece can be legally moved to the hovered square, allow the drop and set the drag over state to that square
     const legalMoves = game.getLegalMovesForSquare(draggedFromSquare);
-    if (legalMoves.some((move) => move.targetSquare === square)) {
+    if (legalMoves.some((move) => move === square)) {
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
       setDragOverSquare(square);
@@ -142,9 +143,10 @@ function App() {
     setDragOverSquare(null);
 
     const legalMoves = game.getLegalMovesForSquare(from);
-    const move = legalMoves.find((candidate) => candidate.targetSquare === square);
+    const move = legalMoves.find((candidate) => candidate === square);
     if (move) {
-      setGame((prev) => prev.applyMove(move));
+      // TODO: PROMOTION
+      setGame((prev) => prev.makeMove(prev.createMove(from, move)));
       setSelectedSquare(null);
       setHoveredSquare(null);
       return;
@@ -153,7 +155,7 @@ function App() {
 
   const previewSquare = selectedSquare ?? hoveredSquare;
   const previewMoves = previewSquare
-    ? game.getLegalMovesForSquare(previewSquare).map((move) => move.targetSquare)
+    ? game.getLegalMovesForSquare(previewSquare)
     : [];
   const previewPiece = previewSquare
     ? game.board.pieceAt(previewSquare)

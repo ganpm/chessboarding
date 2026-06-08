@@ -2,19 +2,6 @@ import {
   Move,
 } from "@/game/move";
 
-const formatMove = (move: Move): string => {
-  const isCastle = move.originSquare.file === 4
-    && move.originSquare.rank === move.targetSquare.rank
-    && Math.abs(move.targetSquare.file - move.originSquare.file) === 2;
-
-  if (isCastle) {
-    return move.targetSquare.file === 6 ? "O-O" : "O-O-O";
-  }
-
-  const promotionChar = move.promotion ? `=${move.promotion.toString().toUpperCase()[0]}` : "";
-  return `${move.originSquare.toString()}-${move.targetSquare.toString()}${promotionChar}`;
-};
-
 interface MovelistProps extends React.HTMLAttributes<HTMLDivElement> {
   moves: Move[];
 }
@@ -61,9 +48,9 @@ export const Movelist = ({ moves, className, ...props }: MovelistProps) => {
                 className="grid grid-cols-[80px_1fr_1fr] items-center gap-x-2 rounded px-1 py-1 text-zinc-800 odd:bg-zinc-100"
               >
                 <span className="font-mono text-zinc-600">{index + 1}.</span>
-                <span className="font-mono">{formatMove(round.white)}</span>
+                <span className="font-mono">{round.white.format()}</span>
                 <span className="font-mono text-zinc-700">
-                  {round.black ? formatMove(round.black) : "-"}
+                  {round.black ? round.black.format() : "-"}
                 </span>
               </li>
             ))}

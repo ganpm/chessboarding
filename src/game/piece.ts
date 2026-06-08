@@ -61,7 +61,18 @@ export class PieceType {
     return this.type as string;
   }
 
-  // TODO: add method to get possible moves for this piece type
+  public symbol(): string {
+    switch (this.type) {
+      case KING:   return "K";
+      case QUEEN:  return "Q";
+      case ROOK:   return "R";
+      case BISHOP: return "B";
+      case KNIGHT: return "N";
+      case PAWN:   return "";
+      default:
+        throw new Error(`Invalid piece type: ${this.type}`);
+    }
+  }
 }
 
 

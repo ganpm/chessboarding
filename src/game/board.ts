@@ -1,5 +1,7 @@
 import { Piece } from "@/game/piece";
 import { Square } from "@/game/square";
+import { Move } from "@/game/move";
+import { getKingsideCastleTargets, getQueensideCastleTargets } from "@/game/movegen";
 
 export class Board {
   public readonly squares: Map<Square, Piece | null>;
@@ -101,54 +103,39 @@ export class Board {
     return this.squares.get(square) || null;
   }
 
-  /**
-   * Returns a new Board instance that is the result of moving a piece from the origin square to the target square.
-   * 
-   * If there is no piece on the origin square, throws an error.
-   * @param origin The square from which the piece is moving.
-   * @param target The square to which the piece is moving.
-   * @returns A new Board instance with the piece moved from the origin to the target square.
-   */
-  public movePiece(origin: Square, target: Square, promotion?: Piece): Board {
-    const piece = this.pieceAt(origin);
-    if (!piece) {
-      throw new Error(`No piece on square ${origin.toString()} to move`);
-    }
+  public applyMove(move: Move): Board {
+    const pieceOwner = move.piece.owner;
 
     const newSquares = new Map(this.squares);
-    newSquares.set(origin, null);
-    newSquares.set(target, promotion || piece);
 
-    return new Board(newSquares);
-  }
+    newSquares.set(move.originSquare, null);
 
-  /**
-   * Returns a new Board instance that is the result of moving two pieces simultaneously from their respective origin squares to their respective target squares.
-   * If there is no piece on either of the origin squares, throws an error.
-   * 
-   * This method is useful for moves that involve moving two pieces at once, such as castling (where both the king and rook move simultaneously).
-   * @param origin1 The square from which the first piece is moving.
-   * @param target1 The square to which the first piece is moving.
-   * @param origin2 The square from which the second piece is moving.
-   * @param target2 The square to which the second piece is moving.
-   * @returns A new Board instance with both pieces moved to their respective target squares.
-   */
-  public moveTwoPieces(origin1: Square, target1: Square, origin2: Square, target2: Square): Board {
-    const piece1 = this.pieceAt(origin1);
-    const piece2 = this.pieceAt(origin2);
-    if (!piece1) {
-      throw new Error(`No piece on square ${origin1.toString()} to move`);
-    }
-    if (!piece2) {
-      throw new Error(`No piece on square ${origin2.toString()} to move`);
+    if (move.isEnPassant && move.capturedSquare) {
+      // Remove the captured pawn from the board for en passant
+      newSquares.set(move.capturedSquare, null);
     }
 
-    const newSquares = new Map(this.squares);
-    newSquares.set(origin1, null);
-    newSquares.set(target1, piece1);
-    newSquares.set(origin2, null);
-    newSquares.set(target2, piece2);
+    if (move.isCastleKingside) {
+      const { kingStartingSquare, kingCastlingSquare, rookStartingSquare, rookCastlingSquare } = getKingsideCastleTargets(pieceOwner);
+      newSquares.set(kingCastlingSquare, move.piece);
+      newSquares.set(kingStartingSquare, null);
+      newSquares.set(rookCastlingSquare, newSquares.get(rookStartingSquare)!);
+      newSquares.set(rookStartingSquare, null);
+    }
 
+    if (move.isCastleQueenside) {
+      const { kingStartingSquare, kingCastlingSquare, rookStartingSquare, rookCastlingSquare } = getQueensideCastleTargets(pieceOwner);
+      newSquares.set(kingCastlingSquare, move.piece);
+      newSquares.set(kingStartingSquare, null);
+      newSquares.set(rookCastlingSquare, newSquares.get(rookStartingSquare)!);
+      newSquares.set(rookStartingSquare, null);
+    }
+
+    const movedPiece = move.promotion
+      ? Piece.get(move.piece.owner, move.promotion)
+      : move.piece;
+
+    newSquares.set(move.targetSquare, movedPiece);
     return new Board(newSquares);
   }
 }

@@ -325,7 +325,7 @@ export class PawnMove {
     [Player.BLACK.toString()]: [0, -2], // Move down 2 squares from starting position
   };
 
-  private static readonly ENPASSANT_CAPTURE_OFFSETS: Record<string, [number, number]> = {
+  public static readonly ENPASSANT_CAPTURE_OFFSETS: Record<string, [number, number]> = {
     [Player.WHITE.toString()]: [0,  1], // Capture up (en passant)
     [Player.BLACK.toString()]: [0, -1], // Capture down (en passant)
   };
@@ -400,4 +400,22 @@ export class PawnMove {
     return targetSquares;
   }
 
+}
+
+export function getKingsideCastleTargets(player: Player): { kingStartingSquare: Square, kingCastlingSquare: Square, rookStartingSquare: Square, rookCastlingSquare: Square } {
+  return {
+    kingStartingSquare: KingMove.STARTING_SQUARES[player.toString()],
+    kingCastlingSquare: KingMove.KINGSIDE_CASTLE_TARGETS[player.toString()],
+    rookStartingSquare: RookMove.KINGSIDE_STARTING_SQUARES[player.toString()],
+    rookCastlingSquare: RookMove.KINGSIDE_CASTLE_TARGETS[player.toString()],
+  };
+}
+
+export function getQueensideCastleTargets(player: Player): { kingStartingSquare: Square, kingCastlingSquare: Square, rookStartingSquare: Square, rookCastlingSquare: Square } {
+  return {
+    kingStartingSquare: KingMove.STARTING_SQUARES[player.toString()],
+    kingCastlingSquare: KingMove.QUEENSIDE_CASTLE_TARGETS[player.toString()],
+    rookStartingSquare: RookMove.QUEENSIDE_STARTING_SQUARES[player.toString()],
+    rookCastlingSquare: RookMove.QUEENSIDE_CASTLE_TARGETS[player.toString()],
+  };
 }

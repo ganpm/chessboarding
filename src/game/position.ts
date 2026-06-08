@@ -144,158 +144,168 @@ export class Position {
    * @param move A move to apply to the current position
    * @returns A new Position with the move applied
    */
-  public applyMove(move: Move): Position {
-    const piece = this.board.pieceAt(move.originSquare);
-    if (!piece) {
-      return this;
-    }
-
-    const player = piece.owner;
-
-    // Castling
-    const kingStartingSquare = KingMove.STARTING_SQUARES[player.toString()];
-
-    // Kingside castling
-    const kingsideRookStartingSquare = RookMove.KINGSIDE_STARTING_SQUARES[player.toString()];
-    const kingsideCastleTargetSquare = KingMove.KINGSIDE_CASTLE_TARGETS[player.toString()];
-    const kingsideRookTargetSquare = RookMove.KINGSIDE_CASTLE_TARGETS[player.toString()];
-
-    if (piece.type === PieceType.KING && move.originSquare === kingStartingSquare && move.targetSquare === kingsideCastleTargetSquare) {
-      const rookPiece = Piece.getRookPiece(piece.owner);
-      if (this.board.pieceAt(kingsideRookStartingSquare) === rookPiece) {
-        const newBoard = this.board.moveTwoPieces(move.originSquare, move.targetSquare, kingsideRookStartingSquare, kingsideRookTargetSquare);
-        const newMoveHistory = [...this.moveHistory, move];
-        return new Position(newBoard, newMoveHistory);
-      }
-    }
-
-    // Queenside castling
-    const queensideRookStartingSquare = RookMove.QUEENSIDE_STARTING_SQUARES[player.toString()];
-    const queensideCastleTargetSquare = KingMove.QUEENSIDE_CASTLE_TARGETS[player.toString()];
-    const queensideRookTargetSquare = RookMove.QUEENSIDE_CASTLE_TARGETS[player.toString()];
-
-    if (piece.type === PieceType.KING && move.originSquare === kingStartingSquare && move.targetSquare === queensideCastleTargetSquare) {
-      const rookPiece = Piece.getRookPiece(piece.owner);
-      if (this.board.pieceAt(queensideRookStartingSquare) === rookPiece) {
-        const newBoard = this.board.moveTwoPieces(move.originSquare, move.targetSquare, queensideRookStartingSquare, queensideRookTargetSquare);
-        const newMoveHistory = [...this.moveHistory, move];
-        return new Position(newBoard, newMoveHistory);
-      }
-    }
-
-    // En passant
-    if (piece.type === PieceType.PAWN) {
-      const fileDelta = move.targetSquare.file - move.originSquare.file;
-      const rankDelta = move.targetSquare.rank - move.originSquare.rank;
-      const isDiagonalStep = Math.abs(fileDelta) === 1;
-      const forwardRankDelta = player.is(Player.WHITE) ? 1 : -1;
-      const isForwardStep = rankDelta === forwardRankDelta;
-      const isTargetSquareEmpty = !this.board.pieceAt(move.targetSquare);
-
-      if (isDiagonalStep && isForwardStep && isTargetSquareEmpty) {
-        const lastMove = this.moveHistory[this.moveHistory.length - 1];
-        if (lastMove) {
-          const lastMovePiece = this.board.pieceAt(lastMove.targetSquare);
-          const opponent = player.opponent();
-          const opponentPawnStartingRank = PawnMove.STARTING_RANK[opponent.toString()];
-          const isOpponentPawnDoubleAdvance =
-            !!lastMovePiece
-            && lastMovePiece.type === PieceType.PAWN
-            && lastMovePiece.owner.is(opponent)
-            && lastMove.originSquare.rank === opponentPawnStartingRank
-            && lastMove.rankDelta() === 2;
-
-          const isAdjacentPawnCapturedEnPassant =
-            lastMove.targetSquare.file === move.targetSquare.file
-            && lastMove.targetSquare.rank === move.originSquare.rank;
-
-          if (isOpponentPawnDoubleAdvance && isAdjacentPawnCapturedEnPassant) {
-            const newSquares = new Map(this.board.squares);
-            newSquares.set(move.originSquare, null);
-            newSquares.set(move.targetSquare, piece);
-            newSquares.set(lastMove.targetSquare, null);
-            const newMoveHistory = [...this.moveHistory, move];
-            return new Position(new Board(newSquares), newMoveHistory);
-          }
-        }
-      }
-    }
-
-    // Promotion
-
-    if (move.promotion) {
-      const promotionPiece = Piece.get(player, move.promotion);
-      const newBoard = this.board
-        .movePiece(move.originSquare, move.targetSquare, promotionPiece);
-      const newMoveHistory = [...this.moveHistory, move];
-      return new Position(newBoard, newMoveHistory);
-    }
-
-    const newBoard = this.board.movePiece(move.originSquare, move.targetSquare);
-    const newMoveHistory = [...this.moveHistory, move];
-    return new Position(newBoard, newMoveHistory);
+  public makeMove(move: Move): Position {
+    return new Position(
+      this.board.applyMove(move),
+      [...this.moveHistory, move]
+    );
   }
 
-
-  public getLegalMovesForSquare(originSquare: Square): Move[] {
+  /**
+   * Generates all legal moves for a piece on the given square.
+   * @param originSquare The square of the piece to generate moves for
+   * @returns An array of squares representing the legal moves for the piece on the given square
+   */
+  public getLegalMovesForSquare(originSquare: Square): Square[] {
     const playerToMove = this.currentPlayerToMove();
     const piece = this.board.pieceAt(originSquare);
     if (!piece || piece.owner !== playerToMove) {
       return [];
     }
-    let targetSquares: Square[] = [];
+    let pseudoMoves: Square[] = [];
 
     switch (piece.type) {
       case PieceType.PAWN:
-        targetSquares = PawnMove.generate(this, originSquare);
+        pseudoMoves = PawnMove.generate(this, originSquare);
         break;
       case PieceType.KNIGHT:
-        targetSquares = KnightMove.generate(this, originSquare);
+        pseudoMoves = KnightMove.generate(this, originSquare);
         break;
       case PieceType.BISHOP:
-        targetSquares = BishopMove.generate(this, originSquare);
+        pseudoMoves = BishopMove.generate(this, originSquare);
         break;
       case PieceType.ROOK:
-        targetSquares = RookMove.generate(this, originSquare);
+        pseudoMoves = RookMove.generate(this, originSquare);
         break;
       case PieceType.QUEEN:
-        targetSquares = QueenMove.generate(this, originSquare);
+        pseudoMoves = QueenMove.generate(this, originSquare);
         break;
       case PieceType.KING:
-        targetSquares = KingMove.generate(this, originSquare);
+        pseudoMoves = KingMove.generate(this, originSquare);
         break;
       default:
         break;
     }
 
-    const moves: Move[] = [];
-
-    if (piece.type !== PieceType.PAWN) {
-      for (const targetSquare of targetSquares) {
-        moves.push(new Move(originSquare, targetSquare));
-      }
-    } else {
-      const promotionRank = PawnMove.PROMOTION_RANK[piece.owner.toString()];
-      for (const targetSquare of targetSquares) {
-        if (targetSquare.rank === promotionRank) {
-          for (const promotionType of PieceType.promotions) {
-            moves.push(new Move(originSquare, targetSquare, promotionType));
-          }
-        } else {
-          moves.push(new Move(originSquare, targetSquare));
-        }
-      }
-    }
-
-    // Remove moves that would put own king in check
-    const legalMoves = moves.filter(move => {
-      const newPosition = this.applyMove(move);
-      const kingSquare = newPosition.findKingSquare(playerToMove);
-      const opponent = playerToMove.opponent();
-      return !newPosition.isSquareAttackedBy(opponent, kingSquare);
+    return pseudoMoves.filter(targetSquare => {
+      const move = this.createMove(originSquare, targetSquare, null, false);
+      // Promotion is null here because it doesn't affect whether the move is legal or not
+      // Important to set evaluateCheckmate to false to avoid infinite recursion between createMove and getLegalMovesForSquare when evaluating checkmate
+      const nextPosition = this.makeMove(move);
+      const kingSquare = nextPosition.findKingSquare(playerToMove);
+      return !nextPosition.isSquareAttackedBy(playerToMove.opponent(), kingSquare);
     });
-
-    return legalMoves;
   }
 
+  /**
+   * Creates a move object for a given origin and target square, and evaluates whether the move results in check or checkmate.
+   * 
+   * This method does not validate whether the move is legal or not, it assumes that the caller has already validated the move.
+   * 
+   * This method is responsible for extracting the necessary information from the position to create a descriptive Move object,
+   * such as the piece being moved, any captured piece, whether the move is a castle or en passant, etc. This is to simplify the
+   * move formatting in the UI by precomputing all the necessary information about the move beforehand.
+   * 
+   * Evaluating check and checkmate flag is added to avoid the infinite recursion between `createMove()` and `getLegalMovesForSquare()` when evaluating whether a move is legal or not.
+   * 
+   * When evaluating whether a move is legal, we don't need to evaluate checkmate, so we can set `evaluateCheckmate` to false to avoid the infinite recursion.
+   * 
+   * When creating a move for the UI, we want to evaluate checkmate to display the correct move formatting, so we can set `evaluateCheckmate` to true.
+   * @param originSquare The square from which the piece is moving
+   * @param targetSquare The square to which the piece is moving
+   * @param promotion The piece type to which a pawn is promoted, if applicable
+   * @param evaluateCheckmate Whether to evaluate if the move results in checkmate
+   * @returns A Move object representing the move
+   */
+  public createMove(
+    originSquare: Square,
+    targetSquare: Square,
+    promotion: PieceType | null = null,
+    evaluateCheckmate: boolean = true,
+  ): Move {
+    const piece = this.board.pieceAt(originSquare);
+    if (!piece) {
+      throw new Error(`No piece at ${originSquare.toString()}`);
+    }
+
+    let capturedPiece = this.board.pieceAt(targetSquare);
+    let capturedSquare: Square | null = capturedPiece ? targetSquare : null;
+
+    // En passant
+    const enPassant = this.getEnPassant();
+    let isEnPassant = false;
+
+    if (
+      piece.type === PieceType.PAWN
+      && enPassant // Double pawn advance detected
+      && !capturedPiece // Target square is empty
+      && targetSquare.file !== originSquare.file // Pawn is moving diagonally
+    ) {
+      isEnPassant = true;
+      capturedSquare = enPassant.captureSquare;
+      capturedPiece = this.board.pieceAt(capturedSquare);
+    }
+
+    // Castling
+    const isCastleKingside = piece.type === PieceType.KING
+      && originSquare === KingMove.STARTING_SQUARES[piece.owner.toString()]
+      && targetSquare === KingMove.KINGSIDE_CASTLE_TARGETS[piece.owner.toString()];
+    
+    const isCastleQueenside = piece.type === PieceType.KING
+      && originSquare === KingMove.STARTING_SQUARES[piece.owner.toString()]
+      && targetSquare === KingMove.QUEENSIDE_CASTLE_TARGETS[piece.owner.toString()];
+
+    const baseMove = new Move(
+      originSquare,
+      targetSquare,
+      piece,
+      capturedPiece,
+      capturedSquare,
+      isCastleKingside,
+      isCastleQueenside,
+      isEnPassant,
+      promotion,
+      false,
+      false,
+    );
+
+    const nextPosition = this.makeMove(baseMove);
+    const opponent = piece.owner.opponent();
+    const isCheck = nextPosition.isSquareAttackedBy(piece.owner, nextPosition.findKingSquare(opponent));
+    
+    let isCheckmate = false;
+    if (evaluateCheckmate && isCheck) {
+      const opponentKingSquare = nextPosition.findKingSquare(opponent);
+      const opponentLegalMoves = nextPosition.getLegalMovesForSquare(opponentKingSquare);
+      isCheckmate = opponentLegalMoves.length === 0;
+    }
+
+    baseMove.isCheck = isCheck;
+    baseMove.isCheckmate = isCheckmate;
+
+    return baseMove;
+  }
+
+
+  private getEnPassant(): { targetSquare: Square, captureSquare: Square } | null {
+    const lastMove = this.moveHistory.at(-1);
+
+    if (!lastMove || lastMove.piece.type !== PieceType.PAWN) {
+      return null;
+    }
+
+    // Ignore if the last move was not a double pawn advance
+    if (lastMove.rankDelta() !== 2) {
+      return null;
+    }
+
+    const file = lastMove.targetSquare.file;
+    // The en passant target square is the square that the pawn passed over during its double advance
+    // For example, if a white pawn moves from e2 to e4, the en passant target square is e3
+    // If a black pawn moves from d7 to d5, the en passant target square is d6
+    const rank = (lastMove.originSquare.rank + lastMove.targetSquare.rank) / 2;
+    const enPassantTargetSquare = Square.fromCoords(file, rank);
+    const enPassantCaptureSquare = lastMove.targetSquare;
+    return { targetSquare: enPassantTargetSquare, captureSquare: enPassantCaptureSquare };
+  }
 }

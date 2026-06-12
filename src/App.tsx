@@ -7,7 +7,7 @@ import {
   Square,
 } from "@/game/square";
 import { Position } from "@/game/position";
-import { PieceType } from "@/game/piece";
+import { Piece, PieceType } from "@/game/piece";
 import { Player } from "@/game/player";
 
 interface PendingPromotion {
@@ -20,9 +20,12 @@ function App() {
   const [game, setGame] = useState<Position>(Position.init());
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [hoveredSquare, setHoveredSquare] = useState<Square | null>(null);
-  const [draggedFromSquare, setDraggedFromSquare] = useState<Square | null>(null);
+  const [grabbedFromSquare, setGrabbedFromSquare] = useState<Square | null>(null);
+  const [grabbedPiece, setGrabbedPiece] = useState<Piece | null>(null);
+  const [grabbedPointer, setGrabbedPointer] = useState<{ x: number; y: number } | null>(null);
   const [dragOverSquare, setDragOverSquare] = useState<Square | null>(null);
   const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
+  const [lastGrabEndedAt, setLastGrabEndedAt] = useState<number>(0);
 
   useEffect(() => {
     if (!pendingPromotion) {
@@ -59,7 +62,26 @@ function App() {
     setHoveredSquare(null);
   };
 
+  const squareAtPoint = (x: number, y: number): Square | null => {
+    const element = document.elementFromPoint(x, y) as HTMLElement | null;
+    const tileElement = element?.closest("[data-square]") as HTMLElement | null;
+    const squareText = tileElement?.dataset.square;
+    if (!squareText) {
+      return null;
+    }
+
+    try {
+      return Square.fromString(squareText);
+    } catch {
+      return null;
+    }
+  };
+
   const handleTileClick = (square: Square) => {
+    if (Date.now() - lastGrabEndedAt < 140) {
+      return;
+    }
+
     if (pendingPromotion) {
       return;
     }
@@ -122,7 +144,7 @@ function App() {
 
     // Don't update hover state if we're currently dragging a piece,
     // or if there is a selected square (hover only applies when no piece is selected)
-    if (draggedFromSquare) {
+    if (grabbedFromSquare) {
       return;
     }
 
@@ -152,76 +174,84 @@ function App() {
     setHoveredSquare(null);
   };
 
-  const handlePieceDragStart = (square: Square, event: React.DragEvent<HTMLImageElement>) => {
-    if (pendingPromotion) {
-      event.preventDefault();
+  const handleTileMouseDown = (square: Square, event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.button !== 0) {
       return;
     }
 
-    // Don't allow dragging if the piece doesn't belong to the current player
+    if (pendingPromotion) {
+      return;
+    }
+
+    // Don't allow grabbing if the piece doesn't belong to the current player
     const piece = game.board.pieceAt(square);
     const currentPlayer = game.currentPlayerToMove();
 
     if (!piece || !piece.owner.is(currentPlayer)) {
-      event.preventDefault();
-      return;
-    }
-
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", square.toString());
-    setDraggedFromSquare(square);
-    setDragOverSquare(null);
-    setSelectedSquare(square);
-    setHoveredSquare(null);
-  };
-
-  const handlePieceDragEnd = () => {
-    setDraggedFromSquare(null);
-    setDragOverSquare(null);
-  };
-
-  const handleTileDragOver = (square: Square, event: React.DragEvent<HTMLDivElement>) => {
-    if (pendingPromotion) {
-      return;
-    }
-
-    // If we're not currently dragging a piece, do nothing
-    if (!draggedFromSquare) {
-      return;
-    }
-
-    // If the dragged piece can be legally moved to the hovered square, allow the drop and set the drag over state to that square
-    const legalMoves = game.getLegalMovesForSquare(draggedFromSquare);
-    if (legalMoves.some((move) => move === square)) {
-      event.preventDefault();
-      event.dataTransfer.dropEffect = "move";
-      setDragOverSquare(square);
-      return;
-    }
-
-    // If the dragged piece cannot be legally moved to the hovered square, clear the drag over state
-    setDragOverSquare(null);
-  };
-
-  const handleTileDrop = (square: Square, event: React.DragEvent<HTMLDivElement>) => {
-    if (pendingPromotion) {
-      event.preventDefault();
       return;
     }
 
     event.preventDefault();
 
-    if (!draggedFromSquare) {
+    setGrabbedFromSquare(square);
+    setGrabbedPiece(piece);
+    setGrabbedPointer({ x: event.clientX, y: event.clientY });
+    setDragOverSquare(null);
+    setSelectedSquare(square);
+    setHoveredSquare(null);
+  };
+
+  useEffect(() => {
+    if (!grabbedFromSquare) {
       return;
     }
 
-    const from = draggedFromSquare;
-    setDraggedFromSquare(null);
-    setDragOverSquare(null);
+    if (pendingPromotion) {
+      setGrabbedFromSquare(null);
+      setGrabbedPiece(null);
+      setGrabbedPointer(null);
+      setDragOverSquare(null);
+      return;
+    }
 
-    const legalMoves = game.getLegalMovesForSquare(from);
-    const move = legalMoves.find((candidate) => candidate === square);
-    if (move) {
+    const handleMouseMove = (event: MouseEvent) => {
+      setGrabbedPointer({ x: event.clientX, y: event.clientY });
+
+      const hoveredSquare = squareAtPoint(event.clientX, event.clientY);
+      if (!hoveredSquare) {
+        setDragOverSquare(null);
+        return;
+      }
+
+      const legalMoves = game.getLegalMovesForSquare(grabbedFromSquare);
+      const legalTarget = legalMoves.find((candidate) => candidate === hoveredSquare) ?? null;
+      setDragOverSquare(legalTarget);
+    };
+
+    const handleMouseUp = (event: MouseEvent) => {
+      if (event.button !== 0) {
+        return;
+      }
+
+      const from = grabbedFromSquare;
+      const target = squareAtPoint(event.clientX, event.clientY);
+
+      setGrabbedFromSquare(null);
+      setGrabbedPiece(null);
+      setGrabbedPointer(null);
+      setDragOverSquare(null);
+      setLastGrabEndedAt(Date.now());
+
+      if (!target) {
+        return;
+      }
+
+      const legalMoves = game.getLegalMovesForSquare(from);
+      const move = legalMoves.find((candidate) => candidate === target);
+      if (!move) {
+        return;
+      }
+
       if (isPromotionMove(game, from, move)) {
         const movingPiece = game.board.pieceAt(from);
         if (movingPiece) {
@@ -237,9 +267,16 @@ function App() {
       }
 
       applyMove(from, move);
-      return;
-    }
-  };
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [game, grabbedFromSquare, pendingPromotion]);
 
   const handlePromotionSelect = (promotion: PieceType) => {
     if (!pendingPromotion) {
@@ -250,7 +287,7 @@ function App() {
     setPendingPromotion(null);
   };
 
-  const previewSquare = selectedSquare ?? hoveredSquare;
+  const previewSquare = grabbedFromSquare ?? selectedSquare ?? hoveredSquare;
   const previewMoves = previewSquare
     ? game.getLegalMovesForSquare(previewSquare)
     : [];
@@ -262,13 +299,14 @@ function App() {
     <div className="flex h-128 justify-center items-start gap-5 my-15">
       <Chessboard
         board={game.board}
+        currentPlayer={game.currentPlayerToMove()}
         onTileClick={handleTileClick}
         onTileHover={handleTileHover}
-        onPieceDragStart={handlePieceDragStart}
-        onPieceDragEnd={handlePieceDragEnd}
-        onTileDragOver={handleTileDragOver}
-        onTileDrop={handleTileDrop}
+        onTileMouseDown={handleTileMouseDown}
         dragOverSquare={dragOverSquare}
+        draggedFromSquare={grabbedFromSquare}
+        grabbedPiece={grabbedPiece}
+        grabbedPointer={grabbedPointer}
         selectedSquare={previewSquare}
         legalMoves={previewMoves}
         previewPiece={previewPiece}

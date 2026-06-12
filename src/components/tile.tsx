@@ -7,25 +7,27 @@ import { assets } from "@/game/assets";
 interface TileProps extends React.HTMLAttributes<HTMLDivElement> {
   color: SquareColor;
   piece: Piece | null;
+  isGrabbing?: boolean;
+  canGrabPiece?: boolean;
+  hidePiece?: boolean;
   selected?: boolean;
   legalMove?: boolean;
   captureTarget?: boolean;
   dragOver?: boolean;
   ghostPiece?: Piece | null;
-  onPieceDragStart?: React.DragEventHandler<HTMLImageElement>;
-  onPieceDragEnd?: React.DragEventHandler<HTMLImageElement>;
 }
 
 export const Tile = ({
   color,
   piece,
+  isGrabbing = false,
+  canGrabPiece = false,
+  hidePiece = false,
   selected = false,
   legalMove = false,
   captureTarget = false,
   dragOver = false,
   ghostPiece = null,
-  onPieceDragStart,
-  onPieceDragEnd,
   ...props
 }: TileProps) => {
   const bg = {
@@ -35,7 +37,7 @@ export const Tile = ({
 
   return (
     <div
-      className={`group relative h-25 w-25 ${bg[color]} ${selected ? "ring-8 ring-inset ring-yellow-400" : ""} ${legalMove ? "cursor-pointer" : ""}`}
+      className={`group relative h-25 w-25 ${bg[color]} ${selected ? "ring-8 ring-inset ring-yellow-400" : ""} ${isGrabbing ? "cursor-grabbing" : legalMove ? "cursor-pointer" : ""}`}
       {...props}
     >
       {legalMove && !piece && (
@@ -62,11 +64,9 @@ export const Tile = ({
         <img
           src={assets[piece.toString()]}
           style={{ imageRendering: "crisp-edges" }}
-          className={`relative z-10 h-full w-full cursor-pointer select-none ${captureTarget ? (dragOver ? "opacity-0" : "group-hover:opacity-0") : ""}`}
+          className={`relative z-10 h-full w-full select-none ${canGrabPiece ? (isGrabbing ? "cursor-grabbing" : "cursor-grab active:cursor-grabbing") : "cursor-auto"} ${hidePiece ? "opacity-0" : ""} ${captureTarget ? (dragOver ? "opacity-0" : "group-hover:opacity-0") : ""}`}
           alt={piece.toString()}
-          draggable={true}
-          onDragStart={onPieceDragStart}
-          onDragEnd={onPieceDragEnd}
+          draggable={false}
         />
       )}
     </div>

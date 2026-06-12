@@ -8,16 +8,18 @@ import {
 import { Board } from "@/game/board";
 import { Piece, PieceType } from "@/game/piece";
 import { Player } from "@/game/player";
+import { assets } from "@/game/assets";
 
 interface ChessboardProps extends React.HTMLAttributes<HTMLDivElement> {
   board: Board;
+  currentPlayer: Player;
   onTileClick: (square: Square) => void;
   onTileHover: (square: Square | null) => void;
-  onPieceDragStart: (square: Square, event: React.DragEvent<HTMLImageElement>) => void;
-  onPieceDragEnd: () => void;
-  onTileDragOver: (square: Square, event: React.DragEvent<HTMLDivElement>) => void;
-  onTileDrop: (square: Square, event: React.DragEvent<HTMLDivElement>) => void;
+  onTileMouseDown: (square: Square, event: React.MouseEvent<HTMLDivElement>) => void;
   dragOverSquare: Square | null;
+  draggedFromSquare: Square | null;
+  grabbedPiece: Piece | null;
+  grabbedPointer: { x: number; y: number } | null;
   selectedSquare: Square | null;
   legalMoves: Square[];
   previewPiece: Piece | null;
@@ -35,13 +37,14 @@ const indexColor = (index: number): SquareColor => {
 
 export const Chessboard = ({
   board,
+  currentPlayer,
   onTileClick,
   onTileHover,
-  onPieceDragStart,
-  onPieceDragEnd,
-  onTileDragOver,
-  onTileDrop,
+  onTileMouseDown,
   dragOverSquare,
+  draggedFromSquare,
+  grabbedPiece,
+  grabbedPointer,
   selectedSquare,
   legalMoves,
   previewPiece,
@@ -56,6 +59,7 @@ export const Chessboard = ({
       <div className="grid grid-flow-row grid-cols-8 grid-rows-8 gap-0 shadow-md">
         {Square.whitePerspective.map((square, index) => {
           const piece = board.pieceAt(square);
+          const canGrabPiece = !!piece && piece.owner.is(currentPlayer);
           const isSelected = selectedSquare === square;
           const isLegalMove = legalMoves.includes(square);
           const isCaptureTarget = isLegalMove && !!piece;
@@ -64,24 +68,39 @@ export const Chessboard = ({
           return (
             <Tile
               key={square.toString()}
+              data-square={square.toString()}
               color={indexColor(index)}
               piece={piece}
+              isGrabbing={!!grabbedPiece}
+              canGrabPiece={canGrabPiece}
+              hidePiece={draggedFromSquare === square}
               selected={isSelected}
               legalMove={isLegalMove}
               captureTarget={isCaptureTarget}
               dragOver={isDragOver}
               ghostPiece={isLegalMove ? previewPiece : null}
               onClick={() => onTileClick(square)}
+              onMouseDown={(event) => onTileMouseDown(square, event)}
               onMouseEnter={() => onTileHover(square)}
               onMouseLeave={() => onTileHover(null)}
-              onDragOver={(event) => onTileDragOver(square, event)}
-              onDrop={(event) => onTileDrop(square, event)}
-              onPieceDragStart={(event) => onPieceDragStart(square, event)}
-              onPieceDragEnd={onPieceDragEnd}
             />
           );
         })}
       </div>
+      {grabbedPiece && grabbedPointer && (
+        <img
+          src={assets[grabbedPiece.toString()]}
+          style={{
+            imageRendering: "crisp-edges",
+            left: `${grabbedPointer.x}px`,
+            top: `${grabbedPointer.y}px`,
+            transform: "translate(-50%, -50%)",
+          }}
+          className="pointer-events-none fixed z-50 h-25 w-25 select-none"
+          alt={grabbedPiece.toString()}
+          draggable={false}
+        />
+      )}
       {promotionSquare && promotionPlayer && (
         <PromotionPicker
           square={promotionSquare}

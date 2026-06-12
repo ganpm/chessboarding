@@ -24,7 +24,7 @@ export const Movelist = ({ moves, className, ...props }: MovelistProps) => {
 
   return (
     <section
-      className={`w-full h-200 max-w-xs rounded-md border border-zinc-300 bg-zinc-50 shadow-sm ${className ?? ""}`}
+      className={`flex h-200 w-full max-w-xs flex-col rounded-md border border-zinc-300 bg-zinc-50 shadow-sm ${className ?? ""}`}
       {...props}
     >
       <header className="border-b border-zinc-300 px-3 py-2">
@@ -37,7 +37,7 @@ export const Movelist = ({ moves, className, ...props }: MovelistProps) => {
         <span>Black</span>
       </div>
 
-      <div className="overflow-y-auto px-3 py-2">
+      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-2">
         {rounds.length === 0 ? (
           <p className="text-center text-zinc-500">No moves yet.</p>
         ) : (

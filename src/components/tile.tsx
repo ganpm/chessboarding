@@ -40,7 +40,7 @@ export const Tile = ({
     >
       {legalMove && !piece && (
         <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <span className={`h-5 w-5 rounded-full bg-gray-700 opacity-50 transition-opacity duration-150 ${ghostPiece ? (dragOver ? "opacity-0" : "group-hover:opacity-0") : ""}`} />
+          <span className={`h-8 w-8 rounded-full bg-gray-800 opacity-50 transition-opacity duration-150 ${ghostPiece ? (dragOver ? "opacity-0" : "group-hover:opacity-0") : ""}`} />
         </span>
       )}
 

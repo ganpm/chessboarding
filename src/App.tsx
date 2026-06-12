@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Chessboard } from "@/components/chessboard"
 import { Movelist } from "@/components/movelist"
-import { PromotionPicker } from "@/components/promotion-picker"
 
 import {
   Square,
@@ -24,6 +23,25 @@ function App() {
   const [draggedFromSquare, setDraggedFromSquare] = useState<Square | null>(null);
   const [dragOverSquare, setDragOverSquare] = useState<Square | null>(null);
   const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
+
+  useEffect(() => {
+    if (!pendingPromotion) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as HTMLElement | null;
+      const clickedInsidePicker = !!target?.closest("[data-promotion-picker='true']");
+      if (!clickedInsidePicker) {
+        setPendingPromotion(null);
+      }
+    };
+
+    window.addEventListener("pointerdown", handlePointerDown);
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [pendingPromotion]);
 
   const isPromotionMove = (position: Position, originSquare: Square, targetSquare: Square): boolean => {
     const piece = position.board.pieceAt(originSquare);
@@ -254,14 +272,12 @@ function App() {
         selectedSquare={previewSquare}
         legalMoves={previewMoves}
         previewPiece={previewPiece}
+        promotionSquare={pendingPromotion?.targetSquare ?? null}
+        promotionPlayer={pendingPromotion?.player ?? null}
+        onPromotionSelect={handlePromotionSelect}
+        onPromotionCancel={() => setPendingPromotion(null)}
       />
       <Movelist moves={game.moveHistory} />
-      {pendingPromotion && (
-        <PromotionPicker
-          player={pendingPromotion.player}
-          onSelect={handlePromotionSelect}
-        />
-      )}
     </div>
   )
 }

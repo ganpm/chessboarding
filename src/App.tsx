@@ -294,6 +294,10 @@ function App() {
   const previewPiece = previewSquare
     ? game.board.pieceAt(previewSquare)
     : null;
+  const lastMove = game.moveHistory.at(-1) ?? null;
+  const lastMoveSquares = lastMove
+    ? [lastMove.originSquare, lastMove.targetSquare] as [Square, Square]
+    : null;
 
   return (
     <div className="flex h-128 justify-center items-start gap-5 my-15">
@@ -309,6 +313,7 @@ function App() {
         grabbedPointer={grabbedPointer}
         selectedSquare={previewSquare}
         legalMoves={previewMoves}
+        lastMoveSquares={lastMoveSquares}
         previewPiece={previewPiece}
         promotionSquare={pendingPromotion?.targetSquare ?? null}
         promotionPlayer={pendingPromotion?.player ?? null}

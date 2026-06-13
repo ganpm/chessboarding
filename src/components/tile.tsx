@@ -15,6 +15,7 @@ interface TileProps extends React.HTMLAttributes<HTMLDivElement> {
   captureTarget?: boolean;
   dragOver?: boolean;
   ghostPiece?: Piece | null;
+  lastMove?: boolean;
 }
 
 export const Tile = ({
@@ -28,6 +29,7 @@ export const Tile = ({
   captureTarget = false,
   dragOver = false,
   ghostPiece = null,
+  lastMove = false,
   ...props
 }: TileProps) => {
   const bg = {
@@ -35,9 +37,15 @@ export const Tile = ({
     light: "bg-[#F0D9B5]",
   };
 
+  const highlightedBg = {
+    dark: "bg-[#8F6747]",
+    light: "bg-[#D4BC97]",
+  };
+  const isDarkenedHighlight = selected || lastMove;
+
   return (
     <div
-      className={`group relative h-25 w-25 ${bg[color]} ${selected ? "ring-8 ring-inset ring-yellow-400" : ""} ${isGrabbing ? "cursor-grabbing" : legalMove ? "cursor-pointer" : ""}`}
+      className={`group relative h-25 w-25 ${isDarkenedHighlight ? highlightedBg[color] : bg[color]} ${isGrabbing ? "cursor-grabbing" : legalMove ? "cursor-pointer" : ""}`}
       {...props}
     >
       {legalMove && !piece && (

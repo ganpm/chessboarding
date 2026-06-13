@@ -22,6 +22,7 @@ interface ChessboardProps extends React.HTMLAttributes<HTMLDivElement> {
   grabbedPointer: { x: number; y: number } | null;
   selectedSquare: Square | null;
   legalMoves: Square[];
+  lastMoveSquares: [Square, Square] | null;
   previewPiece: Piece | null;
   promotionSquare: Square | null;
   promotionPlayer: Player | null;
@@ -47,6 +48,7 @@ export const Chessboard = ({
   grabbedPointer,
   selectedSquare,
   legalMoves,
+  lastMoveSquares,
   previewPiece,
   promotionSquare,
   promotionPlayer,
@@ -64,6 +66,9 @@ export const Chessboard = ({
           const isLegalMove = legalMoves.includes(square);
           const isCaptureTarget = isLegalMove && !!piece;
           const isDragOver = dragOverSquare === square;
+          const isLastMoveSquare =
+            !!lastMoveSquares &&
+            (lastMoveSquares[0] === square || lastMoveSquares[1] === square);
 
           return (
             <Tile
@@ -78,6 +83,7 @@ export const Chessboard = ({
               legalMove={isLegalMove}
               captureTarget={isCaptureTarget}
               dragOver={isDragOver}
+              lastMove={isLastMoveSquare}
               ghostPiece={isLegalMove ? previewPiece : null}
               onClick={() => onTileClick(square)}
               onMouseDown={(event) => onTileMouseDown(square, event)}

@@ -45,13 +45,11 @@ export const Tile = ({
 
   return (
     <div
-      className={`group relative h-25 w-25 ${isDarkenedHighlight ? highlightedBg[color] : bg[color]} ${isGrabbing ? "cursor-grabbing" : legalMove ? "cursor-pointer" : ""}`}
+      className={`group relative h-25 w-25 flex items-center justify-center ${isDarkenedHighlight ? highlightedBg[color] : bg[color]} ${isGrabbing ? "cursor-grabbing" : legalMove ? "cursor-pointer" : ""}`}
       {...props}
     >
       {legalMove && !piece && (
-        <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <span className={`h-8 w-8 rounded-full bg-gray-800 opacity-50 transition-opacity duration-150 ${ghostPiece ? (dragOver ? "opacity-0" : "group-hover:opacity-0") : ""}`} />
-        </span>
+        <span className={`pointer-events-none absolute h-8 w-8 rounded-full bg-gray-800 opacity-50 transition-opacity duration-150 ${dragOver ? "opacity-0" : ""} ${ghostPiece ? "group-hover:opacity-0" : ""}`} />
       )}
 
       {legalMove && captureTarget && (

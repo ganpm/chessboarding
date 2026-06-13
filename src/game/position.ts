@@ -271,14 +271,11 @@ export class Position {
 
     const nextPosition = this.makeMove(baseMove);
     const opponent = piece.owner.opponent();
-    const isCheck = nextPosition.isSquareAttackedBy(piece.owner, nextPosition.findKingSquare(opponent));
-    
-    let isCheckmate = false;
-    if (evaluateCheckmate && isCheck) {
-      const opponentKingSquare = nextPosition.findKingSquare(opponent);
-      const opponentLegalMoves = nextPosition.getLegalMovesForSquare(opponentKingSquare);
-      isCheckmate = opponentLegalMoves.length === 0;
-    }
+    const kingSquare = nextPosition.findKingSquare(opponent);
+    const isCheck = nextPosition.isSquareAttackedBy(piece.owner, kingSquare);
+
+    // This prevents infinite recursion!
+    const isCheckmate = evaluateCheckmate && isCheck && nextPosition.isCheckmate();
 
     baseMove.isCheck = isCheck;
     baseMove.isCheckmate = isCheckmate;
@@ -307,5 +304,49 @@ export class Position {
     const enPassantTargetSquare = Square.fromCoords(file, rank);
     const enPassantCaptureSquare = lastMove.targetSquare;
     return { targetSquare: enPassantTargetSquare, captureSquare: enPassantCaptureSquare };
+  }
+
+  /**
+   * Generates all legal moves for the given player by iterating through all pieces belonging to the player and generating their legal moves.
+   * This method is used to determine if the opponent is in checkmate by checking if they have any legal moves to get out of check.
+   * 
+   * Note that this method is not optimized and performs a brute force check of all pieces and their legal moves.
+   * This is sufficient for our purposes, but could be optimized in the future if performance becomes an issue.
+   * @param player The player for whom to generate legal moves.
+   * @returns An array of legal moves for the given player.
+   */
+  private getLegalMovesForPlayer(player: Player): Move[] {
+    const legalMoves: Move[] = [];
+    for (const [square, piece] of this.board.squares) {
+      if (piece && piece.owner === player) {
+        const pieceLegalMoves = this.getLegalMovesForSquare(square);
+        for (const targetSquare of pieceLegalMoves) {
+          // Make sure evaluateCheckmate is false to avoid infinite recursion.
+          // No need to include promotion options here.
+          legalMoves.push(this.createMove(square, targetSquare, null, false));
+        }
+      }
+    }
+    return legalMoves;
+  }
+
+  /**
+   * Checks if the current player to move is in checkmate.
+   * 
+   * Performs a brute force check of all legal moves for the current player.
+   * If the current player has no legal moves that can get them out of check, then it's checkmate.
+   * @returns True if the current player is in checkmate, false otherwise.
+   */
+  private isCheckmate(): boolean {
+    const player = this.currentPlayerToMove();
+    const legalMoves = this.getLegalMovesForPlayer(player);
+    for (const move of legalMoves) {
+      const nextPosition = this.makeMove(move);
+      const kingSquare = nextPosition.findKingSquare(player);
+      if (!nextPosition.isSquareAttackedBy(player.opponent(), kingSquare)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

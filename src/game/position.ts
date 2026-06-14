@@ -349,4 +349,20 @@ export class Position {
     }
     return true;
   }
+
+  public boardAt(halfMoveIndex: number): Position {
+    const index = Math.max(0, Math.min(halfMoveIndex, this.moveHistory.length));
+
+    if (index === this.moveHistory.length) {
+      return this;
+    }
+
+    // Reconstruct the position by applying exactly `index` moves from the start position.
+    let position = new Position(Board.init());
+    for (let i = 0; i < index; i++) {
+      position = position.makeMove(this.moveHistory[i]);
+    }
+    return position;
+  }
+
 }

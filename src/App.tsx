@@ -26,6 +26,10 @@ function App() {
   const [dragOverSquare, setDragOverSquare] = useState<Square | null>(null);
   const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
   const [lastGrabEndedAt, setLastGrabEndedAt] = useState<number>(0);
+  const [halfMoveIndex, setHalfMoveIndex] = useState<number>(0);
+
+  const isViewOnly = halfMoveIndex !== game.moveHistory.length;
+  const viewedPosition = game.boardAt(halfMoveIndex);
 
   useEffect(() => {
     if (!pendingPromotion) {
@@ -58,6 +62,7 @@ function App() {
 
   const applyMove = (originSquare: Square, targetSquare: Square, promotion: PieceType | null = null) => {
     setGame((prev) => prev.makeMove(prev.createMove(originSquare, targetSquare, promotion)));
+    setHalfMoveIndex((prev) => prev + 1);
     setSelectedSquare(null);
     setHoveredSquare(null);
   };
@@ -78,6 +83,10 @@ function App() {
   };
 
   const handleTileClick = (square: Square) => {
+    if (isViewOnly) {
+      return;
+    }
+
     if (Date.now() - lastGrabEndedAt < 140) {
       return;
     }
@@ -138,6 +147,10 @@ function App() {
   };
 
   const handleTileHover = (square: Square | null) => {
+    if (isViewOnly) {
+      return;
+    }
+
     if (pendingPromotion) {
       return;
     }
@@ -175,6 +188,10 @@ function App() {
   };
 
   const handleTileMouseDown = (square: Square, event: React.MouseEvent<HTMLDivElement>) => {
+    if (isViewOnly) {
+      return;
+    }
+
     if (event.button !== 0) {
       return;
     }
@@ -294,16 +311,53 @@ function App() {
   const previewPiece = previewSquare
     ? game.board.pieceAt(previewSquare)
     : null;
-  const lastMove = game.moveHistory.at(-1) ?? null;
+  const lastMove = viewedPosition.moveHistory.at(-1) ?? null;
   const lastMoveSquares = lastMove
     ? [lastMove.originSquare, lastMove.targetSquare] as [Square, Square]
     : null;
 
+  const resetGame = () => {
+    setGame(Position.init());
+    setHalfMoveIndex(0);
+    setSelectedSquare(null);
+    setHoveredSquare(null);
+    setGrabbedFromSquare(null);
+    setGrabbedPiece(null);
+    setGrabbedPointer(null);
+    setDragOverSquare(null);
+    setPendingPromotion(null);
+  };
+
+  const goToStart = () => {
+    setHalfMoveIndex(0);
+    setSelectedSquare(null);
+    setHoveredSquare(null);
+  };
+
+  const goBackOneMove = () => {
+    setHalfMoveIndex((prev) => Math.max(prev - 1, 0));
+    setSelectedSquare(null);
+    setHoveredSquare(null);
+  };
+
+  const goForwardOneMove = () => {
+    setHalfMoveIndex((prev) => Math.min(prev + 1, game.moveHistory.length));
+    setSelectedSquare(null);
+    setHoveredSquare(null);
+  };
+
+  const goToEnd = () => {
+    setHalfMoveIndex(game.moveHistory.length);
+    setSelectedSquare(null);
+    setHoveredSquare(null);
+  };
+
   return (
     <div className="flex h-128 justify-center items-start gap-5 my-15">
       <Chessboard
-        board={game.board}
-        currentPlayer={game.currentPlayerToMove()}
+        board={viewedPosition.board}
+        viewOnly={isViewOnly}
+        currentPlayer={viewedPosition.currentPlayerToMove()}
         onTileClick={handleTileClick}
         onTileHover={handleTileHover}
         onTileMouseDown={handleTileMouseDown}
@@ -320,7 +374,15 @@ function App() {
         onPromotionSelect={handlePromotionSelect}
         onPromotionCancel={() => setPendingPromotion(null)}
       />
-      <Movelist moves={game.moveHistory} />
+      <Movelist
+        moves={game.moveHistory}
+        currentMoveIndex={halfMoveIndex}
+        resetGame={resetGame}
+        goToStart={goToStart}
+        goBackOneMove={goBackOneMove}
+        goForwardOneMove={goForwardOneMove}
+        goToEnd={goToEnd}
+      />
     </div>
   )
 }

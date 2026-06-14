@@ -13,6 +13,7 @@ import { assets } from "@/game/assets";
 interface ChessboardProps extends React.HTMLAttributes<HTMLDivElement> {
   board: Board;
   currentPlayer: Player;
+  viewOnly: boolean;
   onTileClick: (square: Square) => void;
   onTileHover: (square: Square | null) => void;
   onTileMouseDown: (square: Square, event: React.MouseEvent<HTMLDivElement>) => void;
@@ -39,6 +40,7 @@ const indexColor = (index: number): SquareColor => {
 export const Chessboard = ({
   board,
   currentPlayer,
+  viewOnly,
   onTileClick,
   onTileHover,
   onTileMouseDown,
@@ -61,7 +63,7 @@ export const Chessboard = ({
       <div className="grid grid-flow-row grid-cols-8 grid-rows-8 gap-0 shadow-md">
         {Square.whitePerspective.map((square, index) => {
           const piece = board.pieceAt(square);
-          const canGrabPiece = !!piece && piece.owner.is(currentPlayer);
+          const canGrabPiece = !viewOnly && !!piece && piece.owner.is(currentPlayer);
           const isSelected = selectedSquare === square;
           const isLegalMove = legalMoves.includes(square);
           const isCaptureTarget = isLegalMove && !!piece;
@@ -76,7 +78,7 @@ export const Chessboard = ({
               data-square={square.toString()}
               color={indexColor(index)}
               piece={piece}
-              isGrabbing={!!grabbedPiece}
+              isGrabbing={!viewOnly && !!grabbedPiece}
               canGrabPiece={canGrabPiece}
               hidePiece={draggedFromSquare === square}
               selected={isSelected}

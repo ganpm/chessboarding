@@ -58,43 +58,47 @@ export const Chessboard = ({
   onPromotionCancel,
   ...props
 }: ChessboardProps) => {
-  return (
-    <div className="relative" {...props}>
-      <div className="grid grid-flow-row grid-cols-8 grid-rows-8 gap-0 shadow-md">
-        {Square.whitePerspective.map((square, index) => {
-          const piece = board.pieceAt(square);
-          const canGrabPiece = !viewOnly && !!piece && piece.owner.is(currentPlayer);
-          const isSelected = selectedSquare === square;
-          const isLegalMove = legalMoves.includes(square);
-          const isCaptureTarget = isLegalMove && !!piece;
-          const isDragOver = dragOverSquare === square;
-          const isLastMoveSquare =
-            !!lastMoveSquares &&
-            (lastMoveSquares[0] === square || lastMoveSquares[1] === square);
+  const tileSize = 25;
+  const boardSize = tileSize * 8;
 
-          return (
-            <Tile
-              key={square.toString()}
-              data-square={square.toString()}
-              color={indexColor(index)}
-              piece={piece}
-              isGrabbing={!viewOnly && !!grabbedPiece}
-              canGrabPiece={canGrabPiece}
-              hidePiece={draggedFromSquare === square}
-              selected={isSelected}
-              legalMove={isLegalMove}
-              captureTarget={isCaptureTarget}
-              dragOver={isDragOver}
-              lastMove={isLastMoveSquare}
-              ghostPiece={isLegalMove ? previewPiece : null}
-              onClick={() => onTileClick(square)}
-              onMouseDown={(event) => onTileMouseDown(square, event)}
-              onMouseEnter={() => onTileHover(square)}
-              onMouseLeave={() => onTileHover(null)}
-            />
-          );
-        })}
-      </div>
+  return (
+    <div
+      className={`w-${boardSize} h-${boardSize} shrink-0 grid grid-flow-row grid-cols-8 grid-rows-8 gap-0 shadow-md`}
+      {...props}
+    >
+      {Square.whitePerspective.map((square, index) => {
+        const piece = board.pieceAt(square);
+        const canGrabPiece = !viewOnly && !!piece && piece.owner.is(currentPlayer);
+        const isSelected = selectedSquare === square;
+        const isLegalMove = legalMoves.includes(square);
+        const isCaptureTarget = isLegalMove && !!piece;
+        const isDragOver = dragOverSquare === square;
+        const isLastMoveSquare =
+          !!lastMoveSquares &&
+          (lastMoveSquares[0] === square || lastMoveSquares[1] === square);
+
+        return (
+          <Tile
+            key={square.toString()}
+            data-square={square.toString()}
+            color={indexColor(index)}
+            piece={piece}
+            isGrabbing={!viewOnly && !!grabbedPiece}
+            canGrabPiece={canGrabPiece}
+            hidePiece={draggedFromSquare === square}
+            selected={isSelected}
+            legalMove={isLegalMove}
+            captureTarget={isCaptureTarget}
+            dragOver={isDragOver}
+            lastMove={isLastMoveSquare}
+            ghostPiece={isLegalMove ? previewPiece : null}
+            onClick={() => onTileClick(square)}
+            onMouseDown={(event) => onTileMouseDown(square, event)}
+            onMouseEnter={() => onTileHover(square)}
+            onMouseLeave={() => onTileHover(null)}
+          />
+        );
+      })}
       {grabbedPiece && grabbedPointer && (
         <img
           src={assets[grabbedPiece.toString()]}

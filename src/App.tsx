@@ -353,7 +353,7 @@ function App() {
   };
 
   return (
-    <div className="flex h-128 justify-center items-start gap-5 my-15">
+    <div className="flex justify-center items-center w-100vw h-100vh gap-5 my-15">
       <Chessboard
         board={viewedPosition.board}
         viewOnly={isViewOnly}

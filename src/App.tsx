@@ -28,7 +28,9 @@ function App() {
   const [lastGrabEndedAt, setLastGrabEndedAt] = useState<number>(0);
   const [halfMoveIndex, setHalfMoveIndex] = useState<number>(0);
 
-  const isViewOnly = halfMoveIndex !== game.moveHistory.length;
+  const isCheckmate = game.moveHistory.at(halfMoveIndex - 1)?.isCheckmate ?? false;
+  const isViewingPastMove = halfMoveIndex !== game.moveHistory.length;
+  const isViewOnly = isViewingPastMove || isCheckmate;
   const viewedPosition = game.boardAt(halfMoveIndex);
 
   useEffect(() => {
@@ -315,6 +317,13 @@ function App() {
   const lastMoveSquares = lastMove
     ? [lastMove.originSquare, lastMove.targetSquare] as [Square, Square]
     : null;
+  const checkmateMove = lastMove?.isCheckmate ? lastMove : null;
+  const victoryKingSquare = checkmateMove
+    ? viewedPosition.findKingSquare(checkmateMove.piece.owner)
+    : null;
+  const defeatKingSquare = checkmateMove
+    ? viewedPosition.findKingSquare(checkmateMove.piece.owner.opponent())
+    : null;
 
   const resetGame = () => {
     setGame(Position.init());
@@ -371,6 +380,8 @@ function App() {
         previewPiece={previewPiece}
         promotionSquare={pendingPromotion?.targetSquare ?? null}
         promotionPlayer={pendingPromotion?.player ?? null}
+        victoryKingSquare={victoryKingSquare}
+        defeatKingSquare={defeatKingSquare}
         onPromotionSelect={handlePromotionSelect}
         onPromotionCancel={() => setPendingPromotion(null)}
       />

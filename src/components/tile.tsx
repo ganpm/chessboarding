@@ -3,6 +3,10 @@ import {
 } from "@/game/square";
 import { Piece } from "@/game/piece";
 import { assets } from "@/game/assets";
+import {
+  FaCrown as VictoryIcon,
+  FaHashtag as DefeatIcon,
+} from "react-icons/fa";
 
 interface TileProps extends React.HTMLAttributes<HTMLDivElement> {
   color: SquareColor;
@@ -16,6 +20,7 @@ interface TileProps extends React.HTMLAttributes<HTMLDivElement> {
   dragOver?: boolean;
   ghostPiece?: Piece | null;
   lastMove?: boolean;
+  kingIndicator?: "victory" | "defeat" | null;
 }
 
 export const Tile = ({
@@ -30,6 +35,7 @@ export const Tile = ({
   dragOver = false,
   ghostPiece = null,
   lastMove = false,
+  kingIndicator = null,
   ...props
 }: TileProps) => {
   const bg = {
@@ -74,6 +80,18 @@ export const Tile = ({
           alt={piece.toString()}
           draggable={false}
         />
+      )}
+
+      {kingIndicator && (
+        <span
+          className={`pointer-events-none absolute right-1 top-1 z-30 inline-flex h-6 w-6 items-center justify-center rounded-sm border-2 shadow-sm ${kingIndicator === "victory" ? "border-[#2F5D46] bg-[#D7E8DC] text-[#1E3F30]" : "border-[#7A2D2D] bg-[#EBCFCF] text-[#4D1717]"}`}
+          aria-label={kingIndicator === "victory" ? "Victory indicator" : "Defeat indicator"}
+          title={kingIndicator === "victory" ? "Victory" : "Defeat"}
+        >
+          {kingIndicator === "victory"
+            ? <VictoryIcon className="h-3.5 w-3.5" aria-hidden="true" />
+            : <DefeatIcon className="h-3.5 w-3.5" aria-hidden="true" />}
+        </span>
       )}
     </div>
   );

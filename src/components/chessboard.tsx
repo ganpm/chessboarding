@@ -63,7 +63,7 @@ export const Chessboard = ({
 
   return (
     <div
-      className={`w-${boardSize} h-${boardSize} shrink-0 grid grid-flow-row grid-cols-8 grid-rows-8 gap-0 shadow-md`}
+      className={`relative w-${boardSize} h-${boardSize} shrink-0 grid grid-flow-row grid-cols-8 grid-rows-8 gap-0 shadow-md`}
       {...props}
     >
       {Square.whitePerspective.map((square, index) => {

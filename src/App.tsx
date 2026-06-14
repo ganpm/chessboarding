@@ -25,6 +25,7 @@ function App() {
   const [grabbedPointer, setGrabbedPointer] = useState<{ x: number; y: number } | null>(null);
   const [dragOverSquare, setDragOverSquare] = useState<Square | null>(null);
   const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState<boolean>(false);
   const [lastGrabEndedAt, setLastGrabEndedAt] = useState<number>(0);
   const [halfMoveIndex, setHalfMoveIndex] = useState<number>(0);
 
@@ -306,6 +307,17 @@ function App() {
     setPendingPromotion(null);
   };
 
+  const openResetConfirm = () => {
+    if (game.moveHistory.length === 0) {
+      return;
+    }
+    setIsResetConfirmOpen(true);
+  };
+
+  const closeResetConfirm = () => {
+    setIsResetConfirmOpen(false);
+  };
+
   const previewSquare = grabbedFromSquare ?? selectedSquare ?? hoveredSquare;
   const previewMoves = previewSquare
     ? game.getLegalMovesForSquare(previewSquare)
@@ -335,6 +347,7 @@ function App() {
     setGrabbedPointer(null);
     setDragOverSquare(null);
     setPendingPromotion(null);
+    setIsResetConfirmOpen(false);
   };
 
   const goToStart = () => {
@@ -388,12 +401,40 @@ function App() {
       <Movelist
         moves={game.moveHistory}
         currentMoveIndex={halfMoveIndex}
-        resetGame={resetGame}
+        resetGame={openResetConfirm}
         goToStart={goToStart}
         goBackOneMove={goBackOneMove}
         goForwardOneMove={goForwardOneMove}
         goToEnd={goToEnd}
       />
+      {isResetConfirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 px-4" role="dialog" aria-modal="true" aria-labelledby="reset-confirm-title">
+          <div className="w-full max-w-md rounded-md border border-zinc-300 bg-zinc-50 p-5 shadow-lg">
+            <h2 id="reset-confirm-title" className="text-lg font-semibold text-zinc-900">
+              Reset position?
+            </h2>
+            <p className="mt-2 text-sm text-zinc-700">
+              This will clear the current game and move history. Do you want to continue?
+            </p>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeResetConfirm}
+                className="inline-flex cursor-pointer items-center justify-center rounded-md bg-zinc-200 px-4 py-2 font-medium text-zinc-800 transition-colors duration-150 hover:bg-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={resetGame}
+                className="inline-flex cursor-pointer items-center justify-center rounded-md bg-red-600 px-4 py-2 font-medium text-white transition-colors duration-150 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

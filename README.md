@@ -1,9 +1,9 @@
 # Chessboarding
 
-![Static Badge](https://img.shields.io/badge/typescript-6.0.2-blue?logo=typescript)
-![Static Badge](https://img.shields.io/badge/react-19.2.6-blue?logo=react)
-![Static Badge](https://img.shields.io/badge/tailwindcss-4.3.0-blue?logo=tailwindcss)
-![Static Badge](https://img.shields.io/badge/vite-8.0.13-blue?logo=vite)
+![React](https://img.shields.io/badge/React-19.2.6-22AACA?logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.0.2-3178C6?logo=typescript&logoColor=3178C6)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.3.0-38B2AC?logo=tailwindcss&logoColor=38B2AC)
+![Vite](https://img.shields.io/badge/Vite-8.0.13-646CFF?logo=vite&logoColor=646CFF)
 
 Chessboarding is a browser chess app built with React + TypeScript.
 
@@ -32,6 +32,7 @@ Chessboarding is a browser chess app built with React + TypeScript.
 - Promotion UI with selectable piece type
 - Check and checkmate detection
 - Move list display with algebraic notation
+- Move list navigation
 
 ## Tech Stack
 

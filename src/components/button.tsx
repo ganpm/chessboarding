@@ -1,5 +1,5 @@
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "danger";
 }
 
 export const Button = ({ variant = "primary", className, ...props }: ButtonProps) => {
@@ -7,6 +7,7 @@ export const Button = ({ variant = "primary", className, ...props }: ButtonProps
   const variantStyles = {
     primary: "bg-neutral-600 text-white hover:bg-neutral-700 focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2",
     secondary: "bg-zinc-200 text-zinc-800 hover:bg-zinc-300 focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2",
+    danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2",
   };
 
   return (

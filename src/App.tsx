@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Chessboard } from "@/components/chessboard"
 import { Movelist } from "@/components/movelist"
 import { SidePanel } from "@/components/sidepanel"
+import { Modal } from "@/components/modal";
 
 import {
   Square,
@@ -411,32 +412,16 @@ function App() {
         goToEnd={goToEnd}
       />
       {isResetConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 px-4" role="dialog" aria-modal="true" aria-labelledby="reset-confirm-title">
-          <div className="w-full max-w-md rounded-md border border-zinc-300 bg-zinc-50 p-5 shadow-lg">
-            <h2 id="reset-confirm-title" className="text-lg font-semibold text-zinc-900">
-              Reset position?
-            </h2>
-            <p className="mt-2 text-sm text-zinc-700">
-              This will clear the current game and move history. Do you want to continue?
-            </p>
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={closeResetConfirm}
-                className="inline-flex cursor-pointer items-center justify-center rounded-md bg-zinc-200 px-4 py-2 font-medium text-zinc-800 transition-colors duration-150 hover:bg-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={resetGame}
-                className="inline-flex cursor-pointer items-center justify-center rounded-md bg-red-600 px-4 py-2 font-medium text-white transition-colors duration-150 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-              >
-                Reset
-              </button>
-            </div>
-          </div>
-        </div>
+        <Modal
+          title="Reset Game?"
+          description="Are you sure you want to reset the game? This cannot be undone."
+          confirmButtonText="Reset"
+          cancelButtonText="Cancel"
+          confirmButtonVariant="danger"
+          cancelButtonVariant="secondary"
+          onConfirm={resetGame}
+          onCancel={closeResetConfirm}
+        />
       )}
     </div>
   )

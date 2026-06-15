@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Chessboard } from "@/components/chessboard"
 import { Movelist } from "@/components/movelist"
+import { SidePanel } from "@/components/sidepanel"
 
 import {
   Square,
@@ -33,6 +34,7 @@ function App() {
   const isViewingPastMove = halfMoveIndex !== game.moveHistory.length;
   const isViewOnly = isViewingPastMove || isCheckmate;
   const viewedPosition = game.boardAt(halfMoveIndex);
+  const capturedPieces = viewedPosition.capturedPieces();
 
   useEffect(() => {
     if (!pendingPromotion) {
@@ -376,6 +378,7 @@ function App() {
 
   return (
     <div className="flex justify-center items-center w-100vw h-100vh gap-5 my-15">
+      <SidePanel capturedPieces={capturedPieces} />
       <Chessboard
         board={viewedPosition.board}
         viewOnly={isViewOnly}

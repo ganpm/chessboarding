@@ -1,0 +1,104 @@
+import { assets } from "@/game/assets";
+
+interface SidePanelProps extends React.HTMLAttributes<HTMLDivElement> {
+  capturedPieces: {
+    black: Array<[string, number]>;
+    white: Array<[string, number]>;
+  };
+}
+
+
+export const SidePanel = ({
+  className,
+  ...props
+}: SidePanelProps) => {
+  const playerIconSize = 6;
+  const playerIconSizeClass = `w-${playerIconSize} h-${playerIconSize}`;
+  const capturedPieceIconSize = 4;
+  const capturedPieceIconSizeClass = `w-${capturedPieceIconSize} h-${capturedPieceIconSize}`;
+  
+  const margins: { [key: string]: number } = {
+    "black pawn": 2,
+    "black knight": 2,
+    "black bishop": 2,
+    "black rook": 1,
+    "black queen": 1,
+    "white pawn": 2,
+    "white knight": 2,
+    "white bishop": 2,
+    "white rook": 1,
+    "white queen": 1,
+  }
+  return (
+    <div
+      className={`flex h-200 w-xs flex-col overflow-hidden rounded-md border border-zinc-300 bg-zinc-50 shadow-sm ${className ?? ""}`}
+      {...props}
+    >
+      <div className="flex-1 flex flex-col bg-zinc-100 px-4 py-5">
+        <div className="flex items-center justify-start gap-2">
+          <div className={`${playerIconSizeClass} bg-black border border-zinc-300`} />
+          <p className="text-xs font-semibold tracking-[0.24em] text-zinc-500">BLACK</p>
+          <div className="flex items-center justify-start">
+            {props.capturedPieces.black.map(([piece, count], index) => (
+              <div
+                key={index}
+                className="flex items-center justify-start"
+              >
+                {Array.from({ length: count }).map((_, i) => (
+                  <div
+                    key={`${index}-${i}`}
+                    className={`-ml-${margins[piece]} first:ml-0`}
+                  >
+                    <img
+                      src={assets[piece]}
+                      alt={piece}
+                      className={capturedPieceIconSizeClass}
+                    />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <div className="h-px my-5 w-full bg-zinc-300" />
+        
+        <div className="flex-1" />
+      </div>
+
+      <div className="h-px w-full bg-zinc-300" />
+
+      <div className="flex-1 flex flex-col bg-zinc-100 px-4 py-5">
+        <div className="flex-1" />
+        
+        <div className="h-px my-5 w-full bg-zinc-300" />
+        
+        <div className="flex items-center justify-start gap-2">
+          <div className={`${playerIconSizeClass} bg-white border border-zinc-300`} />
+          <p className="text-xs font-semibold tracking-[0.24em] text-zinc-500">WHITE</p>
+          <div className="flex items-center justify-start">
+            {props.capturedPieces.white.map(([piece, count], index) => (
+              <div
+                key={index}
+                className="flex items-center justify-start"
+              >
+                {Array.from({ length: count }).map((_, i) => (
+                  <div
+                    key={`${index}-${i}`}
+                    className={`-ml-${margins[piece]} first:ml-0`}
+                  >
+                    <img
+                      src={assets[piece]}
+                      alt={piece}
+                      className={capturedPieceIconSizeClass}
+                    />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

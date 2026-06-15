@@ -365,4 +365,31 @@ export class Position {
     return position;
   }
 
+  public capturedPieces(): { white: Array<[string, number]>, black: Array<[string, number]> } {
+    const capturedWhitePieces: Map<string, number> = new Map();
+    const capturedBlackPieces: Map<string, number> = new Map();
+    for (const blackPiece of Piece.BLACK_PIECES.toReversed()) {
+      capturedWhitePieces.set(blackPiece.toString(), 0);
+    }
+    for (const whitePiece of Piece.WHITE_PIECES.toReversed()) {
+      capturedBlackPieces.set(whitePiece.toString(), 0);
+    }
+
+    for (const move of this.moveHistory) {
+      if (move.capturedPiece) {
+        const capturedPiece = move.capturedPiece;
+        if (capturedPiece.owner === Player.WHITE) {
+          capturedWhitePieces.set(capturedPiece.toString(), (capturedWhitePieces.get(capturedPiece.toString()) ?? 0) + 1);
+        } else {
+          capturedBlackPieces.set(capturedPiece.toString(), (capturedBlackPieces.get(capturedPiece.toString()) ?? 0) + 1);
+        }
+      }
+    }
+
+    return {
+      white: Array.from(capturedWhitePieces.entries()),
+      black: Array.from(capturedBlackPieces.entries()),
+    };
+  }
+
 }

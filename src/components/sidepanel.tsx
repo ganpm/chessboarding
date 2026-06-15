@@ -12,23 +12,21 @@ export const SidePanel = ({
   className,
   ...props
 }: SidePanelProps) => {
-  const playerIconSize = 6;
-  const playerIconSizeClass = `w-${playerIconSize} h-${playerIconSize}`;
-  const capturedPieceIconSize = 4;
-  const capturedPieceIconSizeClass = `w-${capturedPieceIconSize} h-${capturedPieceIconSize}`;
+  const playerIconSizeClass = "w-6 h-6";
+  const capturedPieceIconSizeClass = "w-4 h-4";
   
-  const margins: { [key: string]: number } = {
-    "black pawn": 2,
-    "black knight": 2,
-    "black bishop": 2,
-    "black rook": 1,
-    "black queen": 1,
-    "white pawn": 2,
-    "white knight": 2,
-    "white bishop": 2,
-    "white rook": 1,
-    "white queen": 1,
-  }
+  const marginClasses: { [key: string]: string } = {
+    "black pawn": "-ml-2",
+    "black knight": "-ml-2",
+    "black bishop": "-ml-2",
+    "black rook": "-ml-1",
+    "black queen": "-ml-1",
+    "white pawn": "-ml-2",
+    "white knight": "-ml-2",
+    "white bishop": "-ml-2",
+    "white rook": "-ml-1",
+    "white queen": "-ml-1",
+  };
   return (
     <div
       className={`flex h-200 w-xs flex-col overflow-hidden rounded-md border border-zinc-300 bg-zinc-50 shadow-sm ${className ?? ""}`}
@@ -47,7 +45,7 @@ export const SidePanel = ({
                 {Array.from({ length: count }).map((_, i) => (
                   <div
                     key={`${index}-${i}`}
-                    className={`-ml-${margins[piece]} first:ml-0`}
+                    className={`${marginClasses[piece]} first:ml-0`}
                   >
                     <img
                       src={assets[piece]}
@@ -85,7 +83,7 @@ export const SidePanel = ({
                 {Array.from({ length: count }).map((_, i) => (
                   <div
                     key={`${index}-${i}`}
-                    className={`-ml-${margins[piece]} first:ml-0`}
+                    className={`${marginClasses[piece]} first:ml-0`}
                   >
                     <img
                       src={assets[piece]}

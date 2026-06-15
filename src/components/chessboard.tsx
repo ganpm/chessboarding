@@ -9,6 +9,7 @@ import { Board } from "@/game/board";
 import { Piece, PieceType } from "@/game/piece";
 import { Player } from "@/game/player";
 import { assets } from "@/game/assets";
+import { squareSize } from "@/components/utils";
 
 interface ChessboardProps extends React.HTMLAttributes<HTMLDivElement> {
   board: Board;
@@ -67,7 +68,7 @@ export const Chessboard = ({
 
   return (
     <div
-      className={`relative w-${boardSize} h-${boardSize} shrink-0 grid grid-flow-row grid-cols-8 grid-rows-8 gap-0 shadow-md`}
+      className={`relative ${squareSize(boardSize)} shrink-0 grid grid-flow-row grid-cols-8 grid-rows-8 gap-0 shadow-md`}
       {...props}
     >
       {Square.whitePerspective.map((square, index) => {

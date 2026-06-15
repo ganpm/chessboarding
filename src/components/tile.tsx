@@ -7,6 +7,7 @@ import {
   FaCrown as VictoryIcon,
   FaHashtag as DefeatIcon,
 } from "react-icons/fa";
+import { squareSize } from "@/components/utils";
 
 interface TileProps extends React.HTMLAttributes<HTMLDivElement> {
   color: SquareColor;
@@ -51,15 +52,15 @@ export const Tile = ({
 
   return (
     <div
-      className={`group relative h-25 w-25 flex items-center justify-center ${isDarkenedHighlight ? highlightedBg[color] : bg[color]} ${isGrabbing ? "cursor-grabbing" : legalMove ? "cursor-pointer" : ""}`}
+      className={`group relative ${squareSize(25)} flex items-center justify-center ${isDarkenedHighlight ? highlightedBg[color] : bg[color]} ${isGrabbing ? "cursor-grabbing" : legalMove ? "cursor-pointer" : ""}`}
       {...props}
     >
       {legalMove && !piece && (
-        <span className={`pointer-events-none absolute h-8 w-8 rounded-full bg-gray-800 opacity-50 transition-opacity duration-150 ${dragOver ? "opacity-0" : ""} ${ghostPiece ? "group-hover:opacity-0" : ""}`} />
+        <span className={`pointer-events-none absolute ${squareSize(8)} rounded-full bg-gray-800 opacity-50 transition-opacity duration-150 ${dragOver ? "opacity-0" : ""} ${ghostPiece ? "group-hover:opacity-0" : ""}`} />
       )}
 
       {legalMove && captureTarget && (
-        <span className="pointer-events-none absolute inset-2 rounded-full ring-8 ring-emerald-700/70" />
+        <span className={`pointer-events-none absolute inset-2 rounded-full ring-8 ring-emerald-700/70`} />
       )}
 
       {legalMove && ghostPiece && (
@@ -84,13 +85,13 @@ export const Tile = ({
 
       {kingIndicator && (
         <span
-          className={`pointer-events-none absolute right-1 top-1 z-30 inline-flex h-6 w-6 items-center justify-center rounded-sm border-2 shadow-sm ${kingIndicator === "victory" ? "border-[#2F5D46] bg-[#D7E8DC] text-[#1E3F30]" : "border-[#7A2D2D] bg-[#EBCFCF] text-[#4D1717]"}`}
+          className={`pointer-events-none absolute right-1 top-1 z-30 inline-flex ${squareSize(6)} items-center justify-center rounded-sm border-2 shadow-sm ${kingIndicator === "victory" ? "border-[#2F5D46] bg-[#D7E8DC] text-[#1E3F30]" : "border-[#7A2D2D] bg-[#EBCFCF] text-[#4D1717]"}`}
           aria-label={kingIndicator === "victory" ? "Victory indicator" : "Defeat indicator"}
           title={kingIndicator === "victory" ? "Victory" : "Defeat"}
         >
           {kingIndicator === "victory"
-            ? <VictoryIcon className="h-3.5 w-3.5" aria-hidden="true" />
-            : <DefeatIcon className="h-3.5 w-3.5" aria-hidden="true" />}
+            ? <VictoryIcon className={squareSize(6)} aria-hidden="true" />
+            : <DefeatIcon className={squareSize(6)} aria-hidden="true" />}
         </span>
       )}
     </div>

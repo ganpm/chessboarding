@@ -31,10 +31,9 @@ export const SidePanel = ({
   return (
     <div
       className={clsx(
-        "flex",
-        "h-200",
-        "w-xs",
         "flex-col",
+        "h-200",
+        "md:w-xs",
         "overflow-hidden",
         "rounded-md",
         "border",

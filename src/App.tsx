@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { Chessboard } from "@/components/chessboard"
 import { Movelist } from "@/components/movelist"
 import { SidePanel } from "@/components/sidepanel"
+import { PlayerPanel } from "@/components/player-panel"
 import { Modal } from "@/components/modal";
+import { clsx } from "@/components/utils";
 
 import {
   Square,
@@ -378,30 +380,66 @@ function App() {
   };
 
   return (
-    <div className="flex justify-center items-center w-100vw h-100vh gap-5 my-15">
-      <SidePanel capturedPieces={capturedPieces} />
-      <Chessboard
-        board={viewedPosition.board}
-        viewOnly={isViewOnly}
-        currentPlayer={viewedPosition.currentPlayerToMove()}
-        onTileClick={handleTileClick}
-        onTileHover={handleTileHover}
-        onTileMouseDown={handleTileMouseDown}
-        dragOverSquare={dragOverSquare}
-        draggedFromSquare={grabbedFromSquare}
-        grabbedPiece={grabbedPiece}
-        grabbedPointer={grabbedPointer}
-        selectedSquare={previewSquare}
-        legalMoves={previewMoves}
-        lastMoveSquares={lastMoveSquares}
-        previewPiece={previewPiece}
-        promotionSquare={pendingPromotion?.targetSquare ?? null}
-        promotionPlayer={pendingPromotion?.player ?? null}
-        victoryKingSquare={victoryKingSquare}
-        defeatKingSquare={defeatKingSquare}
-        onPromotionSelect={handlePromotionSelect}
-        onPromotionCancel={() => setPendingPromotion(null)}
+    <div
+      className={clsx(
+        "flex",
+        "md:flex-row",
+        "flex-col",
+        "items-center",
+        "justify-center",
+        "gap-5",
+        "md:w-100vw",
+        "md:h-100vh",
+        "md:my-15",
+        "my-1",
+        "md:mx-auto"
+      )}
+    >
+      <SidePanel
+        capturedPieces={capturedPieces}
+        className="hidden md:flex"
       />
+      <div className={clsx(
+        "relative",
+        "flex",
+        "md:w-200",
+        "w-full",
+        "flex-col",
+        "gap-1"
+      )}>
+        <PlayerPanel
+          player="black"
+          capturedPieces={capturedPieces.black}
+          className="md:hidden"
+        />
+        <Chessboard
+          board={viewedPosition.board}
+          viewOnly={isViewOnly}
+          currentPlayer={viewedPosition.currentPlayerToMove()}
+          onTileClick={handleTileClick}
+          onTileHover={handleTileHover}
+          onTileMouseDown={handleTileMouseDown}
+          dragOverSquare={dragOverSquare}
+          draggedFromSquare={grabbedFromSquare}
+          grabbedPiece={grabbedPiece}
+          grabbedPointer={grabbedPointer}
+          selectedSquare={previewSquare}
+          legalMoves={previewMoves}
+          lastMoveSquares={lastMoveSquares}
+          previewPiece={previewPiece}
+          promotionSquare={pendingPromotion?.targetSquare ?? null}
+          promotionPlayer={pendingPromotion?.player ?? null}
+          victoryKingSquare={victoryKingSquare}
+          defeatKingSquare={defeatKingSquare}
+          onPromotionSelect={handlePromotionSelect}
+          onPromotionCancel={() => setPendingPromotion(null)}
+        />
+        <PlayerPanel
+          player="white"
+          capturedPieces={capturedPieces.white}
+          className="md:hidden"
+        />
+      </div>
       <Movelist
         moves={game.moveHistory}
         currentHalfMoveIndex={halfMoveIndex}

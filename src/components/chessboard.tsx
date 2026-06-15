@@ -68,14 +68,16 @@ export const Chessboard = ({
     <div
       className={clsx(
         "relative",
-        "w-200 h-200",
+        "w-full",
         "shrink-0",
+        "aspect-square",
+        "md:w-200 md:h-200",
         "grid",
         "grid-flow-row",
         "grid-cols-8",
         "grid-rows-8",
         "gap-0",
-        "shadow-md",
+        "shadow-sm",
         className
       )}
       {...props}
@@ -123,7 +125,6 @@ export const Chessboard = ({
         <img
           src={assets[grabbedPiece.toString()]}
           style={{
-            imageRendering: "crisp-edges",
             left: `${grabbedPointer.x}px`,
             top: `${grabbedPointer.y}px`,
             transform: "translate(-50%, -50%)",
@@ -134,7 +135,8 @@ export const Chessboard = ({
             "z-50",
             "h-25",
             "w-25",
-            "select-none"
+            "select-none",
+            "[image-rendering:smooth]",
           )}
           alt={grabbedPiece.toString()}
           draggable={false}

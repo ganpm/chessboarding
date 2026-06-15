@@ -55,7 +55,8 @@ export const Tile = ({
       className={clsx(
         "group",
         "relative",
-        "h-25 w-25",
+        "h-full w-full",
+        "md:h-25 md:w-25",
         "flex",
         "items-center",
         "justify-center",
@@ -68,7 +69,8 @@ export const Tile = ({
         <span className={clsx(
           "pointer-events-none",
           "absolute",
-          "w-8 h-8",
+          "md:w-8 md:h-8",
+          "w-4 h-4",
           "rounded-full",
           "bg-gray-800",
           "opacity-50",
@@ -93,7 +95,6 @@ export const Tile = ({
       {legalMove && ghostPiece && (
         <img
           src={assets[ghostPiece.toString()]}
-          style={{ imageRendering: "smooth" }}
           className={clsx(
             "pointer-events-none",
             "absolute",
@@ -104,7 +105,8 @@ export const Tile = ({
             "select-none",
             "transition-opacity",
             "duration-150",
-            dragOver ? "opacity-45" : "opacity-0 group-hover:opacity-45"
+            dragOver ? "opacity-45" : "opacity-0 group-hover:opacity-45",
+            "[image-rendering:smooth]"
           )}
           alt={`${ghostPiece.toString()} ghost preview`}
           draggable={false}
@@ -114,7 +116,6 @@ export const Tile = ({
       {piece && (
         <img
           src={assets[piece.toString()]}
-          style={{ imageRendering: "crisp-edges" }}
           className={clsx(
             "relative",
             "z-10",
@@ -123,7 +124,8 @@ export const Tile = ({
             "select-none",
             canGrabPiece ? (isGrabbing ? "cursor-grabbing" : "cursor-grab active:cursor-grabbing") : "cursor-auto",
             hidePiece && "opacity-0",
-            captureTarget ? (dragOver ? "opacity-0" : "group-hover:opacity-0") : ""
+            captureTarget ? (dragOver ? "opacity-0" : "group-hover:opacity-0") : "",
+            "[image-rendering:smooth]"
           )}
           alt={piece.toString()}
           draggable={false}
@@ -139,7 +141,8 @@ export const Tile = ({
             "top-1",
             "z-30",
             "inline-flex",
-            "w-6 h-6",
+            "md:w-6 md:h-6",
+            "w-4 h-4",
             "items-center",
             "justify-center",
             "rounded-sm",
@@ -151,8 +154,8 @@ export const Tile = ({
           title={kingIndicator === "victory" ? "Victory" : "Defeat"}
         >
           {kingIndicator === "victory"
-            ? <VictoryIcon className="w-6 h-6" aria-hidden="true" />
-            : <DefeatIcon className="w-6 h-6" aria-hidden="true" />}
+            ? <VictoryIcon className="md:w-6 md:h-6 w-4 h-4" aria-hidden="true" />
+            : <DefeatIcon className="md:w-6 md:h-6 w-4 h-4" aria-hidden="true" />}
         </span>
       )}
     </div>

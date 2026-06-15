@@ -1,8 +1,4 @@
 
-export const squareSize = (side: number) => {
-  return `w-${side} h-${side}`;
-};
-
 // Utility function to conditionally join class names
 export const clsx = (...classes: (string | false | undefined | null)[]) => {
   return classes.filter(Boolean).join(" ");

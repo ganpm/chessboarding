@@ -7,7 +7,6 @@ import {
   FaCrown as VictoryIcon,
   FaHashtag as DefeatIcon,
 } from "react-icons/fa";
-import { squareSize } from "@/components/utils";
 import { clsx } from "@/components/utils";
 
 interface TileProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -56,7 +55,7 @@ export const Tile = ({
       className={clsx(
         "group",
         "relative",
-        squareSize(25),
+        "h-25 w-25",
         "flex",
         "items-center",
         "justify-center",
@@ -69,7 +68,7 @@ export const Tile = ({
         <span className={clsx(
           "pointer-events-none",
           "absolute",
-          squareSize(8),
+          "w-8 h-8",
           "rounded-full",
           "bg-gray-800",
           "opacity-50",
@@ -140,7 +139,7 @@ export const Tile = ({
             "top-1",
             "z-30",
             "inline-flex",
-            squareSize(6),
+            "w-6 h-6",
             "items-center",
             "justify-center",
             "rounded-sm",
@@ -152,8 +151,8 @@ export const Tile = ({
           title={kingIndicator === "victory" ? "Victory" : "Defeat"}
         >
           {kingIndicator === "victory"
-            ? <VictoryIcon className={squareSize(6)} aria-hidden="true" />
-            : <DefeatIcon className={squareSize(6)} aria-hidden="true" />}
+            ? <VictoryIcon className="w-6 h-6" aria-hidden="true" />
+            : <DefeatIcon className="w-6 h-6" aria-hidden="true" />}
         </span>
       )}
     </div>

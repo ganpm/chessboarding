@@ -9,7 +9,7 @@ import { Board } from "@/game/board";
 import { Piece, PieceType } from "@/game/piece";
 import { Player } from "@/game/player";
 import { assets } from "@/game/assets";
-import { clsx, squareSize } from "@/components/utils";
+import { clsx } from "@/components/utils";
 
 interface ChessboardProps extends React.HTMLAttributes<HTMLDivElement> {
   board: Board;
@@ -61,24 +61,22 @@ export const Chessboard = ({
   defeatKingSquare,
   onPromotionSelect,
   onPromotionCancel,
+  className,
   ...props
 }: ChessboardProps) => {
-  const tileSize = 25;
-  const boardSize = tileSize * 8;
-
   return (
     <div
-
       className={clsx(
         "relative",
-        squareSize(boardSize),
+        "w-200 h-200",
         "shrink-0",
         "grid",
         "grid-flow-row",
         "grid-cols-8",
         "grid-rows-8",
         "gap-0",
-        "shadow-md"
+        "shadow-md",
+        className
       )}
       {...props}
     >

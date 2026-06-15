@@ -404,7 +404,7 @@ function App() {
       />
       <Movelist
         moves={game.moveHistory}
-        currentMoveIndex={halfMoveIndex}
+        currentHalfMoveIndex={halfMoveIndex}
         resetGame={openResetConfirm}
         goToStart={goToStart}
         goBackOneMove={goBackOneMove}

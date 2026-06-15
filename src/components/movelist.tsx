@@ -12,7 +12,7 @@ import { Button } from "@/components/button";
 
 interface MovelistProps extends React.HTMLAttributes<HTMLDivElement> {
   moves: Move[];
-  currentMoveIndex: number;
+  currentHalfMoveIndex: number;
   resetGame: () => void;
   goToStart: () => void;
   goBackOneMove: () => void;
@@ -31,7 +31,7 @@ interface FullMove {
 const convertHalfMovesToFullMoves = (moves: Move[]): FullMove[] => {
   const fullMoves: FullMove[] = [];
 
-  for (let i = 0; i < moves.length + 1; i += 2) {
+  for (let i = 0; i < moves.length; i += 2) {
     fullMoves.push({
       turn: Math.floor(i / 2) + 1,
       white: moves[i] ?? null,
@@ -51,11 +51,12 @@ export const Movelist = ({
   goBackOneMove,
   goForwardOneMove,
   goToEnd,
-  currentMoveIndex,
+  currentHalfMoveIndex,
   className,
   ...props
 }: MovelistProps) => {
 
+  const activeHalfMoveIndex = currentHalfMoveIndex - 1;
   const fullMoves = convertHalfMovesToFullMoves(moves);
   const buttonSize = 20;
 
@@ -77,7 +78,7 @@ export const Movelist = ({
       </div>
 
       <div className="h-168 flex-1 overflow-y-auto snap-y snap-mandatory px-3 py-2">
-        {fullMoves.length === 0 ? (
+        {moves.length === 0 ? (
           <p className="text-center text-zinc-500">No moves yet.</p>
         ) : (
           <ol>
@@ -87,10 +88,10 @@ export const Movelist = ({
                 className="snap-start h-8 grid grid-cols-[40px_1fr_1fr] gap-x-2 rounded px-1 py-1 text-zinc-800 odd:bg-zinc-100"
               >
                 <span className="font-mono text-zinc-600">{fullMove.turn}.</span>
-                <span className={`flex items-center justify-center font-mono ${currentMoveIndex === fullMove.whiteHalfMoveIndex ? "bg-zinc-300" : ""}`}>
+                <span className={`flex items-center justify-center font-mono ${activeHalfMoveIndex === fullMove.whiteHalfMoveIndex ? "bg-zinc-300" : ""}`}>
                   {fullMove.white ? fullMove.white.format() : "-"}
                 </span>
-                <span className={`flex items-center justify-center font-mono ${currentMoveIndex === fullMove.blackHalfMoveIndex ? "bg-zinc-300" : ""}`}>
+                <span className={`flex items-center justify-center font-mono ${activeHalfMoveIndex === fullMove.blackHalfMoveIndex ? "bg-zinc-300" : ""}`}>
                   {fullMove.black ? fullMove.black.format() : "-"}
                 </span>
               </li>

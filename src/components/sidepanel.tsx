@@ -1,4 +1,5 @@
 import { assets } from "@/game/assets";
+import { clsx } from "@/components/utils";
 
 interface SidePanelProps extends React.HTMLAttributes<HTMLDivElement> {
   capturedPieces: {
@@ -29,7 +30,19 @@ export const SidePanel = ({
   };
   return (
     <div
-      className={`flex h-200 w-xs flex-col overflow-hidden rounded-md border border-zinc-300 bg-zinc-50 shadow-sm ${className ?? ""}`}
+      className={clsx(
+        "flex",
+        "h-200",
+        "w-xs",
+        "flex-col",
+        "overflow-hidden",
+        "rounded-md",
+        "border",
+        "border-zinc-300",
+        "bg-zinc-50",
+        "shadow-sm",
+        className
+      )}
       {...props}
     >
       <div className="flex-1 flex flex-col bg-zinc-100 px-4 py-5">

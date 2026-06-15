@@ -8,6 +8,7 @@ import {
   FaHashtag as DefeatIcon,
 } from "react-icons/fa";
 import { squareSize } from "@/components/utils";
+import { clsx } from "@/components/utils";
 
 interface TileProps extends React.HTMLAttributes<HTMLDivElement> {
   color: SquareColor;
@@ -52,22 +53,60 @@ export const Tile = ({
 
   return (
     <div
-      className={`group relative ${squareSize(25)} flex items-center justify-center ${isDarkenedHighlight ? highlightedBg[color] : bg[color]} ${isGrabbing ? "cursor-grabbing" : legalMove ? "cursor-pointer" : ""}`}
+      className={clsx(
+        "group",
+        "relative",
+        squareSize(25),
+        "flex",
+        "items-center",
+        "justify-center",
+        isDarkenedHighlight ? highlightedBg[color] : bg[color],
+        isGrabbing ? "cursor-grabbing" : legalMove ? "cursor-pointer" : ""
+      )}
       {...props}
     >
       {legalMove && !piece && (
-        <span className={`pointer-events-none absolute ${squareSize(8)} rounded-full bg-gray-800 opacity-50 transition-opacity duration-150 ${dragOver ? "opacity-0" : ""} ${ghostPiece ? "group-hover:opacity-0" : ""}`} />
+        <span className={clsx(
+          "pointer-events-none",
+          "absolute",
+          squareSize(8),
+          "rounded-full",
+          "bg-gray-800",
+          "opacity-50",
+          "transition-opacity",
+          "duration-150",
+          dragOver && "opacity-0",
+          ghostPiece && "group-hover:opacity-0"
+        )} />
       )}
 
       {legalMove && captureTarget && (
-        <span className={`pointer-events-none absolute inset-2 rounded-full ring-8 ring-emerald-700/70`} />
+        <span className={clsx(
+          "pointer-events-none",
+          "absolute",
+          "inset-2",
+          "rounded-full",
+          "ring-8",
+          "ring-emerald-700/70"
+        )} />
       )}
 
       {legalMove && ghostPiece && (
         <img
           src={assets[ghostPiece.toString()]}
           style={{ imageRendering: "smooth" }}
-          className={`pointer-events-none absolute inset-0 z-20 h-full w-full select-none transition-opacity duration-150 ${dragOver ? "opacity-45" : "opacity-0 group-hover:opacity-45"}`}
+          className={clsx(
+            "pointer-events-none",
+            "absolute",
+            "inset-0",
+            "z-20",
+            "h-full",
+            "w-full",
+            "select-none",
+            "transition-opacity",
+            "duration-150",
+            dragOver ? "opacity-45" : "opacity-0 group-hover:opacity-45"
+          )}
           alt={`${ghostPiece.toString()} ghost preview`}
           draggable={false}
         />
@@ -77,7 +116,16 @@ export const Tile = ({
         <img
           src={assets[piece.toString()]}
           style={{ imageRendering: "crisp-edges" }}
-          className={`relative z-10 h-full w-full select-none ${canGrabPiece ? (isGrabbing ? "cursor-grabbing" : "cursor-grab active:cursor-grabbing") : "cursor-auto"} ${hidePiece ? "opacity-0" : ""} ${captureTarget ? (dragOver ? "opacity-0" : "group-hover:opacity-0") : ""}`}
+          className={clsx(
+            "relative",
+            "z-10",
+            "h-full",
+            "w-full",
+            "select-none",
+            canGrabPiece ? (isGrabbing ? "cursor-grabbing" : "cursor-grab active:cursor-grabbing") : "cursor-auto",
+            hidePiece && "opacity-0",
+            captureTarget ? (dragOver ? "opacity-0" : "group-hover:opacity-0") : ""
+          )}
           alt={piece.toString()}
           draggable={false}
         />
@@ -85,7 +133,21 @@ export const Tile = ({
 
       {kingIndicator && (
         <span
-          className={`pointer-events-none absolute right-1 top-1 z-30 inline-flex ${squareSize(6)} items-center justify-center rounded-sm border-2 shadow-sm ${kingIndicator === "victory" ? "border-[#2F5D46] bg-[#D7E8DC] text-[#1E3F30]" : "border-[#7A2D2D] bg-[#EBCFCF] text-[#4D1717]"}`}
+          className={clsx(
+            "pointer-events-none",
+            "absolute",
+            "right-1",
+            "top-1",
+            "z-30",
+            "inline-flex",
+            squareSize(6),
+            "items-center",
+            "justify-center",
+            "rounded-sm",
+            "border-2",
+            "shadow-sm",
+            kingIndicator === "victory" ? "border-[#2F5D46] bg-[#D7E8DC] text-[#1E3F30]" : "border-[#7A2D2D] bg-[#EBCFCF] text-[#4D1717]"
+          )}
           aria-label={kingIndicator === "victory" ? "Victory indicator" : "Defeat indicator"}
           title={kingIndicator === "victory" ? "Victory" : "Defeat"}
         >

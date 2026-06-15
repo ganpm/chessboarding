@@ -2,6 +2,7 @@ import { assets } from "@/game/assets";
 import { Piece, PieceType } from "@/game/piece";
 import { Player } from "@/game/player";
 import { Square } from "@/game/square";
+import { clsx } from "@/components/utils";
 
 interface PromotionPickerProps {
   square: Square;
@@ -56,7 +57,21 @@ export const PromotionPicker = ({ square, player, onSelect, onCancel }: Promotio
                 key={control.key}
                 type="button"
                 onClick={onCancel}
-                className={`flex h-12 w-25 items-center justify-center bg-zinc-900 text-lg font-bold text-zinc-100 transition-colors hover:bg-zinc-700 cursor-pointer ${!isLast ? "border-b border-zinc-300" : ""}`}
+                className={clsx(
+                  "flex",
+                  "h-12",
+                  "w-25",
+                  "items-center",
+                  "justify-center",
+                  "bg-zinc-900",
+                  "text-lg",
+                  "font-bold",
+                  "text-zinc-100",
+                  "transition-colors",
+                  "hover:bg-zinc-700",
+                  "cursor-pointer",
+                  !isLast && "border-b border-zinc-300"
+                )}
                 aria-label="Cancel promotion"
                 title="Cancel promotion"
               >
@@ -71,7 +86,18 @@ export const PromotionPicker = ({ square, player, onSelect, onCancel }: Promotio
               key={control.key}
               type="button"
               onClick={() => onSelect(control.type!)}
-              className={`flex h-25 w-25 items-center justify-center bg-zinc-50 transition-colors hover:bg-zinc-200 cursor-pointer ${!isLast ? "border-b border-zinc-300" : ""}`}
+              className={clsx(
+                "flex",
+                "h-25",
+                "w-25",
+                "items-center",
+                "justify-center",
+                "bg-zinc-50",
+                "transition-colors",
+                "hover:bg-zinc-200",
+                "cursor-pointer",
+                !isLast && "border-b border-zinc-300"
+              )}
               aria-label={`Promote to ${control.type.toString()}`}
               title={`Promote to ${control.type.toString()}`}
             >

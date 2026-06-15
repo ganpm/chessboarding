@@ -1,4 +1,5 @@
 import { Button } from "@/components/button";
+import { clsx } from "@/components/utils";
 
 interface ModalProps {
   title: string;
@@ -22,8 +23,31 @@ export const Modal = ({
   onCancel,
 }: ModalProps) => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 px-4" role="dialog">
-      <div className="w-full max-w-md rounded-md border border-zinc-300 bg-zinc-50 p-5 shadow-lg">
+    <div
+      className={clsx(
+        "fixed",
+        "inset-0",
+        "z-50",
+        "flex",
+        "items-center",
+        "justify-center",
+        "bg-black/35",
+        "px-4"
+      )}
+      role="dialog"
+    >
+      <div
+        className={clsx(
+          "w-full",
+          "max-w-md",
+          "rounded-md",
+          "border",
+          "border-zinc-300",
+          "bg-zinc-50",
+          "p-5",
+          "shadow-lg"
+        )}
+      >
         <h2 id="reset-confirm-title" className="text-lg font-semibold text-zinc-900">
           {title}
         </h2>

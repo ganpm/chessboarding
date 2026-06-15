@@ -9,7 +9,7 @@ import { Board } from "@/game/board";
 import { Piece, PieceType } from "@/game/piece";
 import { Player } from "@/game/player";
 import { assets } from "@/game/assets";
-import { squareSize } from "@/components/utils";
+import { clsx, squareSize } from "@/components/utils";
 
 interface ChessboardProps extends React.HTMLAttributes<HTMLDivElement> {
   board: Board;
@@ -68,7 +68,18 @@ export const Chessboard = ({
 
   return (
     <div
-      className={`relative ${squareSize(boardSize)} shrink-0 grid grid-flow-row grid-cols-8 grid-rows-8 gap-0 shadow-md`}
+
+      className={clsx(
+        "relative",
+        squareSize(boardSize),
+        "shrink-0",
+        "grid",
+        "grid-flow-row",
+        "grid-cols-8",
+        "grid-rows-8",
+        "gap-0",
+        "shadow-md"
+      )}
       {...props}
     >
       {Square.whitePerspective.map((square, index) => {
@@ -119,7 +130,14 @@ export const Chessboard = ({
             top: `${grabbedPointer.y}px`,
             transform: "translate(-50%, -50%)",
           }}
-          className="pointer-events-none fixed z-50 h-25 w-25 select-none"
+          className={clsx(
+            "pointer-events-none",
+            "fixed",
+            "z-50",
+            "h-25",
+            "w-25",
+            "select-none"
+          )}
           alt={grabbedPiece.toString()}
           draggable={false}
         />

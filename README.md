@@ -33,6 +33,8 @@ Chessboarding is a browser chess app built with React + TypeScript.
 - Check and checkmate detection
 - Move list display with algebraic notation
 - Move list navigation
+- Display for captured pieces
+- Mobile view
 
 ## Tech Stack
 
